@@ -21,7 +21,12 @@ import { FloatingLauncher } from '../components/FloatingLauncher.js';
 import { SupportModal } from '../components/SupportModal.js';
 import { WIDGET_STYLES } from '../styles/widget.css.js';
 
-export class ChaiSupportElement extends HTMLElement {
+const SafeHTMLElement: typeof HTMLElement =
+  typeof HTMLElement !== 'undefined'
+    ? HTMLElement
+    : (class {} as unknown as typeof HTMLElement);
+
+export class ChaiSupportElement extends SafeHTMLElement {
   public static get observedAttributes(): string[] {
     return [
       'creator-name',
@@ -36,6 +41,7 @@ export class ChaiSupportElement extends HTMLElement {
       'max-amount',
       'default-tier',
       'note',
+      'enable-3d',
     ];
   }
 
@@ -58,7 +64,11 @@ export class ChaiSupportElement extends HTMLElement {
 
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: 'open' });
+    if (typeof this.attachShadow === 'function') {
+      this.shadow = this.attachShadow({ mode: 'open' });
+    } else {
+      this.shadow = null as unknown as ShadowRoot;
+    }
   }
 
   public connectedCallback(): void {
@@ -85,7 +95,7 @@ export class ChaiSupportElement extends HTMLElement {
     this.paymentState = 'modal_open';
 
     if (this.focusTrap) {
-      this.focusTrap.activate();
+      this.focusTrap.activate(this.launcher?.getButtonElement());
     }
 
     this.announcer?.announce(`Opened support modal for ${this.config.creatorName}`);
@@ -144,6 +154,7 @@ export class ChaiSupportElement extends HTMLElement {
     const headless = this.hasAttribute('headless') || this.config.headless || false;
     const note = this.getAttribute('note') || this.config.note;
     const defaultTierId = this.getAttribute('default-tier') || this.config.defaultTierId;
+    const enable3D = this.hasAttribute('enable-3d') || Boolean(this.config.enable3D);
 
     const minAttr = this.getAttribute('min-amount');
     const maxAttr = this.getAttribute('max-amount');
@@ -162,6 +173,7 @@ export class ChaiSupportElement extends HTMLElement {
       headless,
       note,
       defaultTierId,
+      enable3D,
       minAmountPaise,
       maxAmountPaise,
     };
@@ -210,6 +222,7 @@ export class ChaiSupportElement extends HTMLElement {
       minAmountPaise: this.config.minAmountPaise,
       maxAmountPaise: this.config.maxAmountPaise,
       note: this.config.note,
+      enable3D: this.config.enable3D,
       isInline,
       onClose: () => this.close(),
       onTierSelected: (tier: ChaiTier) => {
@@ -273,6 +286,9 @@ export class ChaiSupportElement extends HTMLElement {
   }
 
   private cleanup(): void {
+    if (this.modal) {
+      this.modal.destroy();
+    }
     if (this.escapeListener) {
       window.removeEventListener('keydown', this.escapeListener);
       this.escapeListener = null;

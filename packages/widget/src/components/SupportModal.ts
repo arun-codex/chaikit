@@ -25,6 +25,7 @@ export interface SupportModalOptions {
   minAmountPaise?: number;
   maxAmountPaise?: number;
   note?: string;
+  enable3D?: boolean;
   isInline?: boolean;
   onClose: () => void;
   onTierSelected: (tier: ChaiTier) => void;
@@ -41,6 +42,8 @@ export class SupportModal {
   private toast: Toast;
   private options: SupportModalOptions;
   private currentAmountPaise: number = 2500; // default Kadak Chai ₹25
+  private chai3dView: any = null;
+  private chai3dStageEl: HTMLElement | null = null;
 
   constructor(options: SupportModalOptions) {
     this.options = {
@@ -72,6 +75,9 @@ export class SupportModal {
         this.paymentPanel.updatePaymentData(tier.amountPaise);
         if (this.customAmountInput) {
           this.customAmountInput.clear();
+        }
+        if (this.chai3dView) {
+          this.chai3dView.setTier(tier.id);
         }
         this.options.onTierSelected(tier);
         this.options.onAmountChanged(tier.amountPaise);
@@ -129,6 +135,13 @@ export class SupportModal {
 
   public isOpen(): boolean {
     return this.backdropEl.classList.contains('open');
+  }
+
+  public destroy(): void {
+    if (this.chai3dView) {
+      this.chai3dView.destroy();
+      this.chai3dView = null;
+    }
   }
 
   public setAmount(amountPaise: number): void {
@@ -218,6 +231,38 @@ export class SupportModal {
     // Body
     const body = document.createElement('div');
     body.className = 'chai-body';
+
+    // Optional 3D Stage (Lazy loaded on demand)
+    if (this.options.enable3D) {
+      const stage = document.createElement('div');
+      stage.className = 'chai-3d-stage';
+      stage.setAttribute('role', 'region');
+      stage.setAttribute('aria-label', '3D Chai Cup View');
+      body.appendChild(stage);
+      this.chai3dStageEl = stage;
+
+      const currentTierId = this.options.defaultTierId || this.options.tiers?.[1]?.id || 'kadak';
+      import('../3d/Chai3DView.js')
+        .then(({ Chai3DView }) => {
+          if (!this.chai3dStageEl) return;
+          this.chai3dView = new Chai3DView(this.chai3dStageEl, {
+            tierId: currentTierId,
+            width: 260,
+            height: 160,
+            onFallback: () => {
+              if (this.chai3dStageEl) {
+                this.chai3dStageEl.style.display = 'none';
+              }
+            },
+          });
+        })
+        .catch((err) => {
+          console.warn('ChaiKit 3D lazy load skipped:', err);
+          if (this.chai3dStageEl) {
+            this.chai3dStageEl.style.display = 'none';
+          }
+        });
+    }
 
     // Toast element for notifications
     body.appendChild(this.toast.getElement());

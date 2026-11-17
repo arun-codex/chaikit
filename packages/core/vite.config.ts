@@ -21,5 +21,6 @@ export default defineConfig({
       external: [],
     },
     sourcemap: true,
+    emptyOutDir: false,
   },
 });

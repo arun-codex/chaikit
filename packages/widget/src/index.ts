@@ -17,8 +17,12 @@ if (typeof window !== 'undefined' && 'customElements' in window) {
  */
 export function mountChaiKit(
   config: import('@chaikit/core').ChaiKitConfig,
-  container: HTMLElement = document.body
-): ChaiSupportElement {
+  container?: HTMLElement
+): ChaiSupportElement | null {
+  if (typeof document === 'undefined') {
+    return null;
+  }
+  const target = container || document.body;
   const el = document.createElement('chai-support') as ChaiSupportElement;
   if (config.creatorName) el.setAttribute('creator-name', config.creatorName);
   if (config.upiId) el.setAttribute('upi-id', config.upiId);
@@ -30,8 +34,9 @@ export function mountChaiKit(
   if (config.headless) el.setAttribute('headless', '');
   if (config.note) el.setAttribute('note', config.note);
   if (config.defaultTierId) el.setAttribute('default-tier', config.defaultTierId);
+  if (config.enable3D) el.setAttribute('enable-3d', '');
 
-  container.appendChild(el);
+  target.appendChild(el);
   return el;
 }
 

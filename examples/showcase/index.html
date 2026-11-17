@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevNotes &mdash; High Performance Systems &amp; Open Source</title>
+  <meta name="description" content="Realistic third-party developer blog demonstrating ChaiKit embeddable widget">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --text-muted: #8b949e;
+      --brand: #58a6ff;
+      --accent: #e9ae5b;
+      --code-bg: #090d13;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 0 16px 120px;
+    }
+
+    /* Navbar */
+    .site-nav {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 24px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .site-logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-bright);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .site-logo span { color: var(--brand); }
+    .nav-links { display: flex; gap: 20px; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: 0.95rem; }
+    .nav-links a:hover { color: var(--text-bright); }
+
+    /* Container */
+    .main-content {
+      max-width: 860px;
+      margin: 40px auto 0;
+    }
+
+    /* Showcase Banner */
+    .showcase-toolbar {
+      background: linear-gradient(135deg, rgba(233, 174, 91, 0.12), rgba(198, 107, 69, 0.12));
+      border: 1px solid rgba(233, 174, 91, 0.35);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 36px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+    }
+    .showcase-info h3 {
+      font-size: 1rem;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .showcase-info p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+    .showcase-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .badge-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-right: 4px;
+    }
+    .ctrl-btn {
+      background: #21262d;
+      color: var(--text-bright);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .ctrl-btn:hover {
+      background: #30363d;
+      border-color: var(--accent);
+    }
+    .ctrl-btn.active {
+      background: var(--accent);
+      color: #1b1410;
+      border-color: var(--accent);
+    }
+
+    /* Article */
+    article header {
+      margin-bottom: 32px;
+    }
+    article h1 {
+      font-size: 2.3rem;
+      line-height: 1.3;
+      color: var(--text-bright);
+      margin-bottom: 12px;
+    }
+    .meta-line {
+      display: flex;
+      gap: 16px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .lead-paragraph {
+      font-size: 1.15rem;
+      color: #dbe4ed;
+      margin-bottom: 24px;
+    }
+    p { margin-bottom: 20px; }
+    h2 {
+      font-size: 1.5rem;
+      color: var(--text-bright);
+      margin: 36px 0 16px;
+    }
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      overflow-x: auto;
+      font-size: 0.9rem;
+      margin: 20px 0;
+      color: #79c0ff;
+    }
+
+    /* Author / Supporter Card */
+    .author-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      margin-top: 50px;
+    }
+    .author-profile {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .avatar {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #c78b52, #c66b45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #fff;
+    }
+    .author-bio h3 {
+      font-size: 1.15rem;
+      color: var(--text-bright);
+    }
+    .author-bio p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* Live custom event monitor */
+    .event-monitor {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 30px;
+      font-size: 0.85rem;
+    }
+    .event-monitor-title {
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+    #log-stream {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: #7ee787;
+      max-height: 120px;
+      overflow-y: auto;
+      font-size: 0.8rem;
+    }
+  </style>
+
+  <!-- Load ChaiKit Web Component from production bundle -->
+  <script defer src="../../packages/widget/dist/chaikit.iife.js"></script>
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <nav class="site-nav">
+    <a href="#" class="site-logo">
+      <span>//</span> DevNotes
+    </a>
+    <div class="nav-links">
+      <a href="#articles">Articles</a>
+      <a href="#projects">Open Source</a>
+      <a href="#about">About</a>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <!-- Interactive Showcase Control Panel -->
+    <aside class="showcase-toolbar" aria-label="ChaiKit Showcase Controls">
+      <div class="showcase-info">
+        <h3>ChaiKit Integration Showcase</h3>
+        <p>This page simulates a live third-party engineering blog embedding <code>&lt;chai-support&gt;</code>.</p>
+      </div>
+
+      <div class="showcase-controls">
+        <span class="badge-label">Theme:</span>
+        <button class="ctrl-btn active" onclick="switchTheme('classic')">Classic</button>
+        <button class="ctrl-btn" onclick="switchTheme('dark')">Dark</button>
+        <button class="ctrl-btn" onclick="switchTheme('cream')">Cream</button>
+        <button class="ctrl-btn" onclick="switchTheme('minimal')">Minimal</button>
+
+        <span class="badge-label" style="margin-left: 10px;">Actions:</span>
+        <button class="ctrl-btn" onclick="openFloatingModal()">Open Modal</button>
+        <button class="ctrl-btn" onclick="toggle3D()" id="btn-3d">Toggle 3D View</button>
+      </div>
+    </aside>
+
+    <!-- Third-Party Blog Article -->
+    <article>
+      <header>
+        <h1>Zero-Copy Serialization in Modern Microservices</h1>
+        <div class="meta-line">
+          <span>By Rahul Sharma</span>
+          <span>&bull;</span>
+          <span>Published on November 17, 2026</span>
+          <span>&bull;</span>
+          <span>8 min read</span>
+        </div>
+      </header>
+
+      <p class="lead-paragraph">
+        Memory allocations in high-throughput network services often dominate CPU cycles. In this article, we explore how zero-copy buffer pools and custom memory allocators reduce p99 latency in production systems.
+      </p>
+
+      <h2>The Cost of Buffer Reallocation</h2>
+      <p>
+        When processing hundreds of thousands of incoming RPC frames per second, naïve byte-array allocations trigger constant garbage collector sweeps. By pre-allocating contiguous memory arenas and slicing slices without cloning, throughput increases by over 300%.
+      </p>
+
+      <pre><code>// Fast zero-copy memory slice pattern
+const frameHeader = Buffer.from(networkStream.read(16));
+const payload = networkStream.subarray(16, 16 + payloadLength);
+processInPlace(payload);</code></pre>
+
+      <p>
+        Indian open-source maintainers spend hundreds of uncompensated hours writing technical deep dives and maintaining critical libraries. Direct, friction-free appreciation keeps our independent open-source ecosystem healthy.
+      </p>
+
+      <!-- Embedded Mode B: Inline Supporter Card in Article Footer -->
+      <section class="author-card" aria-label="Support the author">
+        <div class="author-profile">
+          <div class="avatar">RS</div>
+          <div class="author-bio">
+            <h3>Rahul Sharma</h3>
+            <p>Staff Engineer at CloudScale &bull; Maintainer of 4 open-source networking tools &bull; Bengaluru, India</p>
+          </div>
+        </div>
+
+        <p style="font-size: 0.95rem; color: #adbac7; margin-bottom: 16px;">
+          If this deep dive saved your team debugging hours, consider treating Rahul to a warm cup of chai! 100% of your contribution goes directly to his UPI ID with zero platform fees.
+        </p>
+
+        <!-- Inline ChaiKit Custom Element -->
+        <chai-support
+          id="inline-support"
+          creator-name="Rahul Sharma"
+          upi-id="rahul@okicici"
+          description="Support independent engineering writeups and open source tools."
+          theme="classic"
+          position="inline"
+        ></chai-support>
+      </section>
+
+      <!-- Live Event Stream Monitoring -->
+      <div class="event-monitor">
+        <div class="event-monitor-title">
+          <span>Live Shadow DOM Composed Event Stream</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted);">Real-time dispatch from &lt;chai-support&gt;</span>
+        </div>
+        <div id="log-stream">Widget initialized. Listening for user interactions...</div>
+      </div>
+    </article>
+  </main>
+
+  <!-- Embedded Mode A: Primary Floating Button on Bottom-Right -->
+  <chai-support
+    id="floating-support"
+    creator-name="Rahul Sharma"
+    upi-id="rahul@okicici"
+    description="Enjoying Rahul's technical articles and open-source packages? Buy him a chai!"
+    button-text="Buy Me a Chai ☕"
+    theme="classic"
+    position="bottom-right"
+    enable-3d
+  ></chai-support>
+
+  <!-- Interactive Control Script -->
+  <script>
+    const floating = document.getElementById('floating-support');
+    const inline = document.getElementById('inline-support');
+    const logStream = document.getElementById('log-stream');
+    let is3dEnabled = true;
+
+    function logEvent(msg) {
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.textContent = `[${time}] ${msg}`;
+      logStream.prepend(div);
+    }
+
+    function switchTheme(theme) {
+      floating.setAttribute('theme', theme);
+      inline.setAttribute('theme', theme);
+      document.querySelectorAll('.ctrl-btn').forEach(btn => {
+        if (btn.textContent.toLowerCase() === theme) {
+          btn.classList.add('active');
+        } else if (['classic', 'dark', 'cream', 'minimal'].includes(btn.textContent.toLowerCase())) {
+          btn.classList.remove('active');
+        }
+      });
+      logEvent(`Theme updated to '${theme}'`);
+    }
+
+    function openFloatingModal() {
+      floating.open();
+    }
+
+    function toggle3D() {
+      is3dEnabled = !is3dEnabled;
+      const btn = document.getElementById('btn-3d');
+      if (is3dEnabled) {
+        floating.setAttribute('enable-3d', '');
+        inline.setAttribute('enable-3d', '');
+        btn.textContent = 'Disable 3D View';
+        logEvent('3D WebGL mode enabled');
+      } else {
+        floating.removeAttribute('enable-3d');
+        inline.removeAttribute('enable-3d');
+        btn.textContent = 'Enable 3D View';
+        logEvent('3D WebGL mode disabled (falling back to 2D)');
+      }
+    }
+
+    // Attach listeners to both widgets
+    [floating, inline].forEach(w => {
+      w.addEventListener('chai:opened', e => logEvent(`Modal opened for ${e.detail.creatorName}`));
+      w.addEventListener('chai:closed', () => logEvent('Modal closed'));
+      w.addEventListener('chai:tier-selected', e => logEvent(`Selected tier: ${e.detail.tier.name} (₹${e.detail.amountPaise / 100})`));
+      w.addEventListener('chai:amount-changed', e => logEvent(`Amount changed to ${e.detail.formattedRupees}`));
+      w.addEventListener('chai:upi-handoff-attempted', () => logEvent('Supporter clicked mobile UPI app link'));
+      w.addEventListener('chai:error', e => logEvent(`Error: ${e.detail.message}`));
+    });
+  </script>
+</body>
+</html>

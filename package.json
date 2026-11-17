@@ -10,6 +10,7 @@
     "build": "npm run build --workspaces",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:e2e": "playwright test",
     "typecheck": "tsc -b packages/core packages/widget packages/react",
     "lint": "echo \"Linting check passed\"",
     "clean": "node -e \"const fs=require('fs'); ['packages/core/dist','packages/widget/dist','packages/react/dist'].forEach(d => fs.rmSync(d, {recursive:true, force:true}))\""
@@ -26,6 +27,7 @@
   "author": "ChaiKit Contributors",
   "license": "MIT",
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",

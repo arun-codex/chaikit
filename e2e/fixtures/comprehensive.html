@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChaiKit Comprehensive E2E Test Fixture</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #120e0b;
+      color: #f6e8d2;
+      padding: 24px;
+      margin: 0;
+    }
+    .test-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+  </style>
+  <script defer src="/packages/widget/dist/chaikit.iife.js"></script>
+</head>
+<body>
+  <h1>ChaiKit E2E Verification Fixture</h1>
+
+  <div class="test-controls">
+    <button id="btn-dyn-add" onclick="addDynamicWidget()">Add Dynamic Widget</button>
+    <button id="btn-dyn-remove" onclick="removeDynamicWidget()">Remove Dynamic Widget</button>
+    <button id="btn-simulate-nav" onclick="simulateNavigation()">Simulate Client Nav</button>
+    <button id="btn-theme-dark" onclick="setWidgetTheme('dark')">Set Dark Theme</button>
+    <button id="btn-theme-cream" onclick="setWidgetTheme('cream')">Set Cream Theme</button>
+  </div>
+
+  <div id="dynamic-container" style="margin: 20px 0;"></div>
+
+  <div id="inline-section">
+    <h2>Inline Supporter Card</h2>
+    <chai-support
+      id="inline-widget"
+      creator-name="Dev Anand"
+      upi-id="dev@okaxis"
+      description="Enjoying my articles? Buy me a warm chai!"
+      position="inline"
+      theme="classic"
+    ></chai-support>
+  </div>
+
+  <!-- Primary Floating Widget -->
+  <chai-support
+    id="main-widget"
+    creator-name="Pooja Sharma"
+    upi-id="pooja@okhdfcbank"
+    description="Full-stack developer building open source tools."
+    button-text="Buy Me a Chai ☕"
+    theme="classic"
+    position="bottom-right"
+    enable-3d
+  ></chai-support>
+
+  <div id="event-sink" style="display:none;"></div>
+
+  <script>
+    const events = [];
+    function trackEvent(name, detail) {
+      events.push({ name, detail, time: Date.now() });
+      const sink = document.getElementById('event-sink');
+      if (sink) {
+        sink.setAttribute('data-last-event', name);
+        sink.setAttribute('data-event-count', String(events.length));
+      }
+    }
+
+    const mainWidget = document.getElementById('main-widget');
+    ['chai:opened', 'chai:closed', 'chai:tier-selected', 'chai:amount-changed', 'chai:upi-handoff-attempted', 'chai:error'].forEach(evt => {
+      mainWidget.addEventListener(evt, (e) => trackEvent(evt, e.detail));
+    });
+
+    function setWidgetTheme(theme) {
+      mainWidget.setAttribute('theme', theme);
+    }
+
+    function addDynamicWidget() {
+      const container = document.getElementById('dynamic-container');
+      const el = document.createElement('chai-support');
+      el.id = 'dynamic-widget';
+      el.setAttribute('creator-name', 'Rohan Verma');
+      el.setAttribute('upi-id', 'rohan@upi');
+      el.setAttribute('position', 'inline');
+      container.appendChild(el);
+    }
+
+    function removeDynamicWidget() {
+      const el = document.getElementById('dynamic-widget');
+      if (el) {
+        el.remove();
+      }
+    }
+
+    function simulateNavigation() {
+      // Simulate client-side SPA route transition
+      window.history.pushState({ page: 'about' }, 'About Page', '/about');
+      const h1 = document.querySelector('h1');
+      if (h1) h1.textContent = 'Navigated SPA Route - ChaiKit Remains Mounted';
+    }
+
+    window.__CHAIKIT_EVENTS__ = events;
+  </script>
+</body>
+</html>

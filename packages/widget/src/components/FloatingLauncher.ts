@@ -12,6 +12,7 @@ export interface FloatingLauncherOptions {
 
 export class FloatingLauncher {
   private element: HTMLElement;
+  private buttonEl: HTMLButtonElement | null = null;
   private options: FloatingLauncherOptions;
 
   constructor(options: FloatingLauncherOptions) {
@@ -21,6 +22,10 @@ export class FloatingLauncher {
 
   public getElement(): HTMLElement {
     return this.element;
+  }
+
+  public getButtonElement(): HTMLButtonElement | null {
+    return this.buttonEl;
   }
 
   public updateText(text: string): void {
@@ -59,6 +64,7 @@ export class FloatingLauncher {
       this.options.onOpen();
     });
 
+    this.buttonEl = btn;
     wrapper.appendChild(btn);
     return wrapper;
   }

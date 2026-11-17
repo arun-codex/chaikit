@@ -72,6 +72,39 @@ export class PaymentPanel {
     }
   }
 
+  private async copyText(text: string, successMessage: string): Promise<void> {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+        this.options.onCopySuccess(successMessage);
+        return;
+      }
+    } catch {
+      // Fallback
+    }
+
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.top = '-9999px';
+      textarea.setAttribute('readonly', '');
+      document.body.appendChild(textarea);
+      textarea.select();
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      if (successful) {
+        this.options.onCopySuccess(successMessage);
+      } else {
+        this.options.onCopySuccess(`UPI: ${text}`);
+      }
+    } catch {
+      this.options.onCopySuccess(`UPI: ${text}`);
+    }
+  }
+
   private render(): {
     element: HTMLElement;
     qrFrameEl: HTMLElement;
@@ -130,13 +163,7 @@ export class PaymentPanel {
       <span>Copy UPI ID</span>
     `;
     copyUpiBtn.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(this.options.upiId);
-        this.options.onCopySuccess('UPI ID copied to clipboard!');
-      } catch {
-        // Fallback for older environments
-        this.options.onCopySuccess(this.options.upiId);
-      }
+      await this.copyText(this.options.upiId, 'UPI ID copied to clipboard!');
     });
     actions.appendChild(copyUpiBtn);
 

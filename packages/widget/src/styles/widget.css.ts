@@ -346,6 +346,32 @@ export const WIDGET_STYLES = /* css */ `
   margin-bottom: 8px;
 }
 
+/* ---------------- 3D STAGE (OPTIONAL) ---------------- */
+.chai-3d-stage {
+  width: 100%;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, rgba(233, 174, 91, 0.15) 0%, rgba(43, 29, 22, 0.4) 65%, transparent 100%);
+  border-radius: var(--chai-radius-sm);
+  margin-bottom: 2px;
+  border: 1px solid var(--chai-border);
+  overflow: hidden;
+  position: relative;
+}
+
+.chai-3d-canvas {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+}
+
+.chai-3d-canvas:active {
+  cursor: grabbing;
+}
+
 /* ---------------- TIERS GRID ---------------- */
 .chai-tiers-grid {
   display: grid;

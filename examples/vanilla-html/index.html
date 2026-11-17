@@ -136,6 +136,7 @@
         <button class="btn" onclick="setTheme('dark')">Dark</button>
         <button class="btn" onclick="setTheme('cream')">Cream</button>
         <button class="btn" onclick="setTheme('minimal')">Minimal</button>
+        <button class="btn" id="btn-toggle-3d" onclick="toggle3D()">Toggle 3D View: ON</button>
       </div>
 
       <div class="controls" style="margin-top: 14px;">
@@ -196,11 +197,26 @@
     button-text="Buy Me a Chai ☕"
     theme="classic"
     position="bottom-right"
+    enable-3d
   ></chai-support>
 
   <script>
     const widget = document.getElementById('main-widget');
     const eventLog = document.getElementById('event-log');
+    let is3dEnabled = true;
+
+    function toggle3D() {
+      is3dEnabled = !is3dEnabled;
+      if (is3dEnabled) {
+        widget.setAttribute('enable-3d', '');
+        document.getElementById('btn-toggle-3d').textContent = 'Toggle 3D View: ON';
+        log('3D Mode Enabled');
+      } else {
+        widget.removeAttribute('enable-3d');
+        document.getElementById('btn-toggle-3d').textContent = 'Toggle 3D View: OFF';
+        log('3D Mode Disabled (2D Vector Art)');
+      }
+    }
 
     function log(msg) {
       const line = document.createElement('div');

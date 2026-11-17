@@ -7,6 +7,18 @@ import { formatUpiAmount } from '../amount/index.js';
 import type { UpiParams } from '../types/index.js';
 import { sanitizeText, validateUpiId } from '../validation/index.js';
 
+export interface UpiHandoffResult {
+  /**
+   * Whether the upi:// intent dispatch was attempted in the browser.
+   * NOTE: This only confirms intent dispatch, NOT that the user approved or completed the transfer!
+   */
+  dispatched: boolean;
+  /** Backwards compatibility alias for dispatched */
+  success: boolean;
+  error?: string;
+  note: string;
+}
+
 /**
  * Builds a standard UPI payment URI (`upi://pay?...`).
  *
@@ -17,7 +29,8 @@ import { sanitizeText, validateUpiId } from '../validation/index.js';
  * - cu: Currency (INR)
  * - tn: Transaction note (optional)
  *
- * NOTE: Never inject unauthorized merchant codes or fake signatures.
+ * NOTE: Never inject unauthorized merchant codes (`mc`), fake transaction IDs (`tr`),
+ * or fabricated signatures (`sign`). Doing so triggers bank security blocks.
  */
 export function buildUpiUri(params: {
   upiId: string;
@@ -30,8 +43,16 @@ export function buildUpiUri(params: {
     throw new Error(`Cannot build UPI URI: ${upiCheck.error}`);
   }
 
+  if (typeof params.amountPaise !== 'number' || isNaN(params.amountPaise) || !isFinite(params.amountPaise) || params.amountPaise <= 0) {
+    throw new Error('Cannot build UPI URI: Amount must be a positive number of paise (greater than 0).');
+  }
+
   const cleanUpi = params.upiId.trim();
-  const cleanName = sanitizeText(params.creatorName, 60);
+  let cleanName = sanitizeText(params.creatorName, 60);
+  if (!cleanName) {
+    cleanName = 'Creator';
+  }
+
   const formattedAmount = formatUpiAmount(params.amountPaise);
   const cleanNote = sanitizeText(params.note || `Chai for ${cleanName}`, 80);
 
@@ -70,6 +91,11 @@ export function parseUpiUri(uri: string): UpiParams | null {
       return null;
     }
 
+    const numAm = Number(am);
+    if (isNaN(numAm) || numAm <= 0) {
+      return null;
+    }
+
     return {
       pa,
       pn,
@@ -103,20 +129,35 @@ export function isMobileDevice(): boolean {
 /**
  * Attempts mobile UPI app handoff via window.location.href or direct intent link.
  * Must only be called within a user-initiated event (click/tap).
+ *
+ * CRITICAL PAYMENT TRUTHFULNESS:
+ * A returned `dispatched: true` does NOT mean the user paid.
+ * Only an acquiring bank or webhook can confirm transfer completion.
  */
-export function attemptUpiHandoff(upiUri: string): { success: boolean; error?: string } {
+export function attemptUpiHandoff(upiUri: string): UpiHandoffResult {
   if (typeof window === 'undefined') {
-    return { success: false, error: 'Window environment not available.' };
+    return {
+      dispatched: false,
+      success: false,
+      error: 'Window environment not available.',
+      note: 'UPI handoff can only be executed in a browser environment.',
+    };
   }
 
   try {
     // Open UPI link
     window.location.href = upiUri;
-    return { success: true };
+    return {
+      dispatched: true,
+      success: true,
+      note: 'Dispatched upi:// intent. This does not confirm payment completion; the supporter must complete the transfer in their banking app.',
+    };
   } catch (err) {
     return {
+      dispatched: false,
       success: false,
       error: err instanceof Error ? err.message : 'Failed to launch UPI application.',
+      note: 'Failed to dispatch upi:// intent.',
     };
   }
 }
