@@ -3,13 +3,13 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
   workflow_dispatch:
     inputs:
       dry_run:
-        description: 'Dry run: build and verify packages without publishing to npm or creating release'
-        required: false
-        default: false
+        description: 'Dry run: build and verify packages without publishing (default: true)'
+        required: true
+        default: true
         type: boolean
 
 permissions:
@@ -23,10 +23,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
 
       - name: Install dependencies
@@ -46,10 +46,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
 
       - name: Install dependencies
@@ -82,31 +82,51 @@ jobs:
             }
           '
 
+      - name: Upload Verified Dist Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-dist-artifacts
+          path: |
+            packages/core/dist/
+            packages/widget/dist/
+            packages/react/dist/
+          retention-days: 1
+
   publish-npm:
     name: 3. Publish to npm
     needs: [build-and-verify]
-    if: ${{ github.event.inputs.dry_run != 'true' }}
+    # Production safety: ONLY publish on genuine semver tag pushes, never on manual workflow_dispatch
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.event.inputs.dry_run != 'true'
     runs-on: ubuntu-latest
+    environment: npm-release
     permissions:
       contents: read
       id-token: write
     steps:
-      - name: Checkout repository
+      - name: Checkout tagged commit
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
 
-      - name: Setup Node.js
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Build all packages
-        run: npm run build
+      - name: Download Verified Dist Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: built-dist-artifacts
+          path: .
 
-      # Strictly ordered: Core -> Widget -> React (fails immediately if any step fails; no failure swallowing)
+      # Publication order is strictly sequential: Core -> Widget -> React
+      # Fails immediately if any step fails (set -e).
+      # Uses OIDC Trusted Publishing with provenance. If NPM_TOKEN secret is configured,
+      # it provides fallback authentication for initial bootstrapping before trusted publishing is configured.
       - name: Publish @chaikit/core (Tier 1 Engine)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -117,7 +137,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish -w packages/widget --provenance --access public
 
-      - name: Publish @chaikit/react (Tier 3 Wrapper)
+      - name: Publish @chaikit/react (Tier 3 React Adapter)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish -w packages/react --provenance --access public
@@ -125,25 +145,22 @@ jobs:
   github-release:
     name: 4. Create GitHub Release
     needs: [publish-npm]
-    if: ${{ github.event.inputs.dry_run != 'true' }}
+    # Guaranteed to execute ONLY if publish-npm succeeded completely
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.event.inputs.dry_run != 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout repository
+      - name: Checkout tagged commit
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: 'npm'
+          ref: ${{ github.ref }}
 
-      - name: Install dependencies
-        run: npm ci --ignore-scripts
-
-      - name: Build production bundles for release assets
-        run: npm run build
+      - name: Download Verified Dist Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: built-dist-artifacts
+          path: .
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
