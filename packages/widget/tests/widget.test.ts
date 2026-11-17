@@ -115,4 +115,24 @@ describe('ChaiKit Web Component (<chai-support>)', () => {
     expect(errorSpy).toHaveBeenCalled();
     invalidEl.destroy();
   });
+
+  it('renders without 3D stage by default, and adds 3D stage only when enable-3d is explicitly set', () => {
+    element.open();
+    // Default element: no 3D stage
+    expect(element.shadowRoot?.querySelector('.chai-3d-stage')).toBeNull();
+
+    // Element with enable-3d
+    const threeEl = document.createElement('chai-support') as ChaiSupportElement;
+    threeEl.setAttribute('creator-name', 'Rohan');
+    threeEl.setAttribute('upi-id', 'rohan@upi');
+    threeEl.setAttribute('enable-3d', '');
+    document.body.appendChild(threeEl);
+
+    threeEl.open();
+    const stage = threeEl.shadowRoot?.querySelector('.chai-3d-stage');
+    expect(stage).not.toBeNull();
+    expect(stage?.getAttribute('aria-label')).toBe('3D Chai Cup View');
+
+    threeEl.destroy();
+  });
 });

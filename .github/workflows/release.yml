@@ -4,6 +4,13 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: build and verify packages without publishing to npm or creating release'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -25,11 +32,14 @@ jobs:
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
+      - name: Run Typecheck
+        run: npm run typecheck
+
       - name: Run Unit & Component Tests
         run: npm test
 
   build-and-verify:
-    name: 2. Build & Verify Packages
+    name: 2. Build & Verify Package Tarballs
     needs: [validate]
     runs-on: ubuntu-latest
     steps:
@@ -57,18 +67,25 @@ jobs:
           tar -tf chaikit-widget-*.tgz
           tar -tf chaikit-react-*.tgz
 
-      - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-artifacts
-          path: |
-            packages/core/dist/
-            packages/widget/dist/
-            packages/react/dist/
+      - name: Verify Bundle Size (< 50 KB gzipped)
+        run: |
+          node -e '
+            const fs = require("fs");
+            const zlib = require("zlib");
+            const file = "packages/widget/dist/chaikit.iife.js";
+            const content = fs.readFileSync(file);
+            const gzipSize = zlib.gzipSync(content).length;
+            console.log("IIFE Bundle Gzip Size:", gzipSize, "bytes (" + (gzipSize / 1024).toFixed(2) + " KB)");
+            if (gzipSize > 50 * 1024) {
+              console.error("FAIL: IIFE bundle exceeded 50KB gzip budget!");
+              process.exit(1);
+            }
+          '
 
   publish-npm:
     name: 3. Publish to npm
     needs: [build-and-verify]
+    if: ${{ github.event.inputs.dry_run != 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -83,26 +100,24 @@ jobs:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-artifacts
-          path: .
-
       - name: Install dependencies
         run: npm ci --ignore-scripts
 
-      - name: Publish @chaikit/core
+      - name: Build all packages
+        run: npm run build
+
+      # Strictly ordered: Core -> Widget -> React (fails immediately if any step fails; no failure swallowing)
+      - name: Publish @chaikit/core (Tier 1 Engine)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish -w packages/core --provenance --access public
 
-      - name: Publish @chaikit/widget
+      - name: Publish @chaikit/widget (Tier 2 Web Component & CDN Script)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish -w packages/widget --provenance --access public
 
-      - name: Publish @chaikit/react
+      - name: Publish @chaikit/react (Tier 3 Wrapper)
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish -w packages/react --provenance --access public
@@ -110,6 +125,7 @@ jobs:
   github-release:
     name: 4. Create GitHub Release
     needs: [publish-npm]
+    if: ${{ github.event.inputs.dry_run != 'true' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -117,16 +133,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: dist-artifacts
-          path: dist-release
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Build production bundles for release assets
+        run: npm run build
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             packages/widget/dist/chaikit.iife.js
+            packages/widget/dist/chaikit.iife.js.map
             packages/widget/dist/chaikit.esm.js
+            packages/widget/dist/chaikit.esm.js.map
           generate_release_notes: true

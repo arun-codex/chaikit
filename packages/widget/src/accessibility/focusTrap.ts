@@ -17,7 +17,12 @@ export class FocusTrap {
 
     // Remember the trigger element, fallback to activeElement
     const rootNode = this.container.getRootNode() as Document | ShadowRoot;
-    const currentActive = (rootNode && 'activeElement' in rootNode ? rootNode.activeElement : null) || document.activeElement;
+    let currentActive: Element | null = null;
+    try {
+      currentActive = (rootNode && 'activeElement' in rootNode ? rootNode.activeElement : null) || document.activeElement;
+    } catch {
+      currentActive = (typeof document !== 'undefined' ? document.activeElement : null);
+    }
     this.previousActiveElement = triggerElement || (currentActive as HTMLElement | null);
 
     // Find focusable elements
