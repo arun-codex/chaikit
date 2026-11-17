@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChaiKit - Vanilla HTML Showcase</title>
+  <style>
+    :root {
+      --bg: #120e0b;
+      --card-bg: #1c1511;
+      --border: #38251c;
+      --text: #f6e8d2;
+      --text-muted: #b39e8f;
+      --accent: #e9ae5b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 40px 20px 100px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    header {
+      margin-bottom: 40px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 2.4rem;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    p.lead {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+    @media (min-width: 768px) {
+      .grid { grid-template-columns: 1fr 1fr; }
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+    }
+    h2 {
+      font-size: 1.3rem;
+      margin-bottom: 14px;
+      color: var(--text);
+    }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    button.btn {
+      background: var(--border);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.15s ease;
+    }
+    button.btn:hover {
+      background: var(--accent);
+      color: #1b1410;
+    }
+    button.btn-primary {
+      background: var(--accent);
+      color: #1b1410;
+    }
+    pre {
+      background: #090605;
+      padding: 14px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 12px;
+      color: #a8d5e5;
+      border: 1px solid #241812;
+      margin-top: 12px;
+    }
+    #event-log {
+      max-height: 160px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 12px;
+      color: #10b981;
+      background: #090605;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #241812;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(233, 174, 91, 0.15);
+      color: var(--accent);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+  </style>
+
+  <!-- Load ChaiKit Web Component from compiled bundle -->
+  <script defer src="../../packages/widget/dist/chaikit.iife.js"></script>
+</head>
+<body>
+  <header>
+    <span class="badge">Universal Web Component</span>
+    <h1>ChaiKit Demo</h1>
+    <p class="lead">Universal "Buy Me a Chai" widget for Indian websites &amp; creators powered by direct UPI.</p>
+  </header>
+
+  <div class="grid">
+    <!-- Card 1: Interactive Theme & Position Controls -->
+    <div class="card">
+      <h2>Widget Controls</h2>
+      <p style="font-size: 13px; color: var(--text-muted);">Switch themes and trigger programmatic controls dynamically:</p>
+      
+      <div class="controls">
+        <button class="btn" onclick="setTheme('classic')">Classic</button>
+        <button class="btn" onclick="setTheme('dark')">Dark</button>
+        <button class="btn" onclick="setTheme('cream')">Cream</button>
+        <button class="btn" onclick="setTheme('minimal')">Minimal</button>
+      </div>
+
+      <div class="controls" style="margin-top: 14px;">
+        <button class="btn btn-primary" onclick="openWidget()">Open Modal (Programmatic)</button>
+        <button class="btn" onclick="closeWidget()">Close Modal</button>
+        <button class="btn" onclick="setCustomTandoori()">Set to Tandoori (₹50)</button>
+      </div>
+    </div>
+
+    <!-- Card 2: Live Event Stream -->
+    <div class="card">
+      <h2>Live Custom Events</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Event stream listening to shadow DOM composed events:</p>
+      <div id="event-log">Listening for events...</div>
+    </div>
+  </div>
+
+  <!-- Card 3: Inline Card Mode -->
+  <div class="card" style="margin-bottom: 30px;">
+    <h2>Inline Card Mode</h2>
+    <p style="font-size: 13px; color: var(--text-muted);">
+      For blog footers, author bios, or GitHub project pages (<code>position="inline"</code>):
+    </p>
+    <chai-support
+      id="inline-widget"
+      creator-name="Rohan Joshi"
+      upi-id="rohan@okaxis"
+      description="Enjoyed reading this article? A warm cup of chai keeps the tutorials coming!"
+      position="inline"
+      theme="classic"
+    ></chai-support>
+  </div>
+
+  <!-- Card 4: Embed Code Snippet -->
+  <div class="card">
+    <h2>HTML Embed Snippet</h2>
+    <p style="font-size: 13px; color: var(--text-muted);">
+      Add this snippet before <code>&lt;/body&gt;</code> on any static site, WordPress, Hugo, or Jekyll page:
+    </p>
+    <pre>&lt;!-- 1. Include ChaiKit script --&gt;
+&lt;script defer src="https://cdn.jsdelivr.net/npm/chaikit@1.0.0/dist/chaikit.iife.js"&gt;&lt;/script&gt;
+
+&lt;!-- 2. Configure your creator widget --&gt;
+&lt;chai-support
+  creator-name="Your Name"
+  upi-id="yourname@bank"
+  theme="auto"
+  position="bottom-right"
+&gt;&lt;/chai-support&gt;</pre>
+  </div>
+
+  <!-- Primary Floating Widget Instance -->
+  <chai-support
+    id="main-widget"
+    creator-name="Ananya Sharma"
+    upi-id="ananya@okhdfcbank"
+    description="Enjoying my open-source work? A little chai goes a long way!"
+    button-text="Buy Me a Chai ☕"
+    theme="classic"
+    position="bottom-right"
+  ></chai-support>
+
+  <script>
+    const widget = document.getElementById('main-widget');
+    const eventLog = document.getElementById('event-log');
+
+    function log(msg) {
+      const line = document.createElement('div');
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      eventLog.prepend(line);
+    }
+
+    function setTheme(theme) {
+      widget.setAttribute('theme', theme);
+      log(`Theme changed to '${theme}'`);
+    }
+
+    function openWidget() {
+      widget.open();
+    }
+
+    function closeWidget() {
+      widget.close();
+    }
+
+    function setCustomTandoori() {
+      widget.setAmount(5000); // 5000 paise = ₹50
+      widget.open();
+      log('Set amount to ₹50 and opened');
+    }
+
+    // Attach custom event listeners
+    widget.addEventListener('chai:opened', (e) => log(`Event 'chai:opened' (creator: ${e.detail.creatorName})`));
+    widget.addEventListener('chai:closed', () => log(`Event 'chai:closed'`));
+    widget.addEventListener('chai:tier-selected', (e) => log(`Event 'chai:tier-selected' (${e.detail.tier.name} - ₹${e.detail.amountPaise / 100})`));
+    widget.addEventListener('chai:amount-changed', (e) => log(`Event 'chai:amount-changed' (${e.detail.formattedRupees})`));
+    widget.addEventListener('chai:upi-handoff-attempted', (e) => log(`Event 'chai:upi-handoff-attempted'`));
+  </script>
+</body>
+</html>

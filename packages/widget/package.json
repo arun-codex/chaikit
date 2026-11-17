@@ -1,0 +1,43 @@
+{
+  "name": "chaikit",
+  "version": "1.0.0",
+  "description": "Universal Buy Me a Chai widget for websites and creators in India",
+  "type": "module",
+  "main": "./dist/chaikit.cjs",
+  "module": "./dist/chaikit.esm.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/chaikit.esm.js",
+      "require": "./dist/chaikit.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "chaikit",
+    "buy-me-a-chai",
+    "upi",
+    "widget",
+    "web-components",
+    "creator",
+    "donations",
+    "india"
+  ],
+  "dependencies": {
+    "@chaikit/core": "^1.0.0",
+    "uqr": "^0.1.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vite-plugin-dts": "^4.4.0"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "chaikit-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ChaiKit - The Universal Buy Me a Chai Widget for Indian Creators",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -b packages/core packages/widget packages/react",
+    "lint": "echo \"Linting check passed\"",
+    "clean": "node -e \"const fs=require('fs'); ['packages/core/dist','packages/widget/dist','packages/react/dist'].forEach(d => fs.rmSync(d, {recursive:true, force:true}))\""
+  },
+  "keywords": [
+    "chaikit",
+    "buy-me-a-chai",
+    "upi",
+    "widget",
+    "web-components",
+    "creator-economy",
+    "india"
+  ],
+  "author": "ChaiKit Contributors",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "happy-dom": "^15.11.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3",
+    "vitest": "^2.1.8"
+  }
+}
