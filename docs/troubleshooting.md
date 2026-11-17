@@ -9,7 +9,7 @@ Common installation and runtime issues and their solutions.
 ### Check Script Loading
 Make sure the ChaiKit script is loaded before or after the `<chai-support>` custom element:
 ```html
-<script defer src="https://cdn.jsdelivr.net/npm/chaikit@1.0.0/dist/chaikit.iife.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@chaikit/widget@1.0.0/dist/chaikit.iife.js"></script>
 ```
 
 ### Check Browser Console

@@ -49,7 +49,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'node e2e/server.js',
+    command: 'node e2e/server.mjs',
     url: 'http://127.0.0.1:4173/examples/vanilla-html/index.html',
     reuseExistingServer: true,
     timeout: 15000,

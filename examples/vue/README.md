@@ -26,7 +26,7 @@ export default defineConfig({
 
 ```vue
 <script setup>
-import 'chaikit';
+import '@chaikit/widget';
 </script>
 
 <template>

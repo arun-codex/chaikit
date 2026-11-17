@@ -1,11 +1,13 @@
 {
-  "name": "chaikit",
+  "name": "@chaikit/widget",
   "version": "1.0.0",
   "description": "Universal Buy Me a Chai widget for websites and creators in India",
   "type": "module",
   "main": "./dist/chaikit.cjs",
   "module": "./dist/chaikit.esm.js",
   "types": "./dist/index.d.ts",
+  "unpkg": "./dist/chaikit.iife.js",
+  "jsdelivr": "./dist/chaikit.iife.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -14,8 +16,13 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "vite build",
     "typecheck": "tsc --noEmit",
@@ -39,5 +46,15 @@
     "typescript": "^5.7.2",
     "vite": "^6.0.3",
     "vite-plugin-dts": "^4.4.0"
-  }
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arun-codex/chaikit.git",
+    "directory": "packages/widget"
+  },
+  "bugs": {
+    "url": "https://github.com/arun-codex/chaikit/issues"
+  },
+  "homepage": "https://github.com/arun-codex/chaikit#readme"
 }

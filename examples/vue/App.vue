@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import 'chaikit';
+import '@chaikit/widget';
 
 const creatorName = ref('Vikram Rao');
 const upiId = ref('vikram@upi');

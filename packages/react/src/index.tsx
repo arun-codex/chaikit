@@ -17,8 +17,8 @@ import type {
   ChaiKitTheme,
   ChaiTier,
 } from '@chaikit/core';
-import 'chaikit';
-import type { ChaiSupportElement } from 'chaikit';
+import '@chaikit/widget';
+import type { ChaiSupportElement } from '@chaikit/widget';
 
 export interface ChaiSupportProps {
   creatorName: string;

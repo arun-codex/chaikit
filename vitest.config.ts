@@ -5,6 +5,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@chaikit/core': resolve(__dirname, 'packages/core/src/index.ts'),
+      '@chaikit/widget': resolve(__dirname, 'packages/widget/src/index.ts'),
       'chaikit': resolve(__dirname, 'packages/widget/src/index.ts'),
     },
   },

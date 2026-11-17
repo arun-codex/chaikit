@@ -35,7 +35,7 @@ chai-support {
 Through JavaScript or the React wrapper, you can define custom tiers:
 
 ```ts
-import { mountChaiKit } from 'chaikit';
+import { mountChaiKit } from '@chaikit/widget';
 
 mountChaiKit({
   creatorName: 'Arjun',

@@ -14,10 +14,11 @@ Most creator support widgets are built for Western payment gateways or require c
 - **Universal:** Works in plain HTML, React, Next.js, Vue, Svelte, Astro, WordPress, Jekyll, Hugo, and static sites.
 - **Zero Middlemen & Zero Fees:** 100% of contributions go directly to your configured UPI ID.
 - **No Backend Required:** Self-contained client-side library. Runs on static websites and GitHub Pages.
-- **Ultra Lightweight:** Under **18 KB gzipped** for the complete bundle including SVG illustrations and QR generator.
+- **Lightweight (~22 KB gzipped):** The entire standalone browser bundle — including all vector illustrations, steam animation physics, themes, and client-side QR engine — is **22.07 KB gzipped** (well below the 50 KB budget).
+- **Optional 3D Visuals:** Procedural 3D clay kulhad mode (**4.03 KB gzipped**), lazy-loaded on demand with zero heavy external 3D engine dependencies.
 - **Privacy-First:** Zero analytics, zero cookies, zero external network requests.
-- **Accessible (WCAG 2.2 AA):** Fully keyboard navigable, focus trapped, screen-reader friendly, and respects reduced-motion preferences.
-- **Payment Truthful:** Never fakes transaction verification or receipts.
+- **Accessible (WCAG 2.2 AA):** Fully keyboard navigable, modal focus-trapped, screen-reader friendly, and respects reduced-motion preferences.
+- **Payment Truthful:** Never fakes transaction verification, receipts, or supporter counters.
 
 ---
 
@@ -28,8 +29,8 @@ Most creator support widgets are built for Western payment gateways or require c
 Add the script and custom element before your closing `</body>` tag:
 
 ```html
-<!-- Load ChaiKit from CDN -->
-<script defer src="https://cdn.jsdelivr.net/npm/chaikit@1.0.0/dist/chaikit.iife.js"></script>
+<!-- Load ChaiKit from CDN (pin the version in production) -->
+<script defer src="https://cdn.jsdelivr.net/npm/@chaikit/widget@1.0.0/dist/chaikit.iife.js"></script>
 
 <!-- Place the widget -->
 <chai-support
@@ -43,16 +44,16 @@ Add the script and custom element before your closing `</body>` tag:
 ### 2. npm / Bundler Installation
 
 ```bash
-npm install chaikit
+npm install @chaikit/widget
 ```
 
-In your main entry file:
+In your application entry file:
 
 ```ts
-import 'chaikit';
+import '@chaikit/widget';
 ```
 
-Then use `<chai-support>` in your HTML templates or JSX.
+Then use `<chai-support>` in your HTML templates, Vue, Svelte, or JSX.
 
 ### 3. React / Next.js Integration
 
@@ -71,6 +72,7 @@ export function Header() {
       description="Enjoying my work? A little chai goes a long way!"
       theme="classic"
       position="bottom-right"
+      buttonText="Buy Me a Chai ☕"
     />
   );
 }
@@ -118,27 +120,44 @@ Supporters can also enter any custom amount between ₹10 and ₹10,000 (configu
 
 | Attribute | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `creator-name` | `string` | *(Required)* | Display name of the creator. |
+| `creator-name` | `string` | *(Required)* | Display name of the creator shown in modal and UPI payee name. |
 | `upi-id` | `string` | *(Required)* | Payee Virtual Payment Address (e.g. `name@bank`). |
 | `description` | `string` | `"Enjoying my work?..."` | Short message shown in header. |
 | `button-text` | `string` | `"Buy Me a Chai ☕"` | Text on the floating launcher button. |
 | `theme` | `'classic' \| 'dark' \| 'cream' \| 'minimal' \| 'auto'` | `'classic'` | Visual color theme. |
 | `position` | `'bottom-right' \| 'bottom-left' \| 'inline'` | `'bottom-right'` | Placement on screen or inline flow. |
 | `accent-color` | `string` | Theme default | Custom accent color override. |
-| `headless` | `boolean` | `false` | Suppresses floating button. |
+| `enable-3d` | `boolean` | `false` | Enables optional 3D kulhad viewport. |
+| `headless` | `boolean` | `false` | Suppresses floating button for custom triggers. |
 | `min-amount` | `number` | `10` | Minimum custom contribution in ₹. |
 | `max-amount` | `number` | `10000` | Maximum custom contribution in ₹. |
 
 ---
 
-## Payment Truthfulness Policy
+## Direct UPI Payments & Truthfulness Policy
 
-A browser script cannot independently confirm whether an ordinary direct peer-to-peer (P2P) UPI payment succeeded.
+A browser script cannot independently confirm whether an ordinary direct peer-to-peer (P2P) UPI payment succeeded. True verification requires a licensed payment aggregator backend and bank-authenticated webhooks.
 
 ChaiKit maintains strict transparency:
 - **Never** shows a fake "Payment successful" screen.
 - **Never** generates fake receipts or false supporter badges.
 - Prominently advises supporters: *"Complete payment in your UPI app. Please verify the recipient name before confirming."*
+
+### Mobile Hand-off & In-App WebViews
+- On mobile devices, clicking **"Open in UPI App"** triggers the native `upi://pay` intent handler.
+- If deep-links are blocked by in-app browsers (e.g., Instagram, Twitter/X, LinkedIn WebViews), ChaiKit provides immediate fallback: the high-contrast QR code remains scannable and a single tap copies the creator's UPI ID to the clipboard.
+
+---
+
+## Performance & Bundle Sizes
+
+| Artifact | Format | Uncompressed | Gzipped |
+| :--- | :--- | :--- | :--- |
+| `chaikit.iife.js` | Self-contained Browser Script | 76.64 kB | **22.07 kB** |
+| `chaikit.esm.js` | ES Module Package | 81.58 kB | **21.64 kB** |
+| `Chai3DView.js` | Optional 3D Module (Lazy-loaded) | 13.04 kB | **4.03 kB** |
+| `@chaikit/react` | React Wrapper | 13.48 kB | **4.02 kB** |
+| `@chaikit/core` | Core Engine | 27.90 kB | **9.43 kB** |
 
 ---
 
@@ -147,9 +166,9 @@ ChaiKit maintains strict transparency:
 ```
 chaikit/
   packages/
-    core/       # Core payment engine, exact paise math, UPI URI, QR generator
-    widget/     # Web Component <chai-support> (Shadow DOM, illustrations, themes)
-    react/      # React adapter component (<ChaiSupport />)
+    core/       # @chaikit/core: Validation, exact paise math, UPI URI, QR generator
+    widget/     # @chaikit/widget: Web Component <chai-support> (Shadow DOM, illustrations, themes)
+    react/      # @chaikit/react: React wrapper component (<ChaiSupport />)
   examples/
     vanilla-html/ # Interactive showcase with theme & event controls
     react/        # React sandbox
@@ -167,8 +186,11 @@ chaikit/
 # Install dependencies
 npm install --ignore-scripts
 
-# Run test suite (Vitest)
+# Run test suite (Vitest unit tests)
 npm test
+
+# Run browser tests (Playwright across Chromium, Firefox, WebKit, Mobile Chrome)
+npm run test:e2e
 
 # Build all packages
 npm run build

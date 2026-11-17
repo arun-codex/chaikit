@@ -9,8 +9,8 @@ ChaiKit is designed to be installed in under 60 seconds on any website.
 Add this script tag and custom element anywhere before your closing `</body>` tag:
 
 ```html
-<!-- 1. Include ChaiKit from CDN -->
-<script defer src="https://cdn.jsdelivr.net/npm/chaikit@1.0.0/dist/chaikit.iife.js"></script>
+<!-- 1. Include ChaiKit from CDN (pin the version for production stability) -->
+<script defer src="https://cdn.jsdelivr.net/npm/@chaikit/widget@1.0.0/dist/chaikit.iife.js"></script>
 
 <!-- 2. Place the widget element -->
 <chai-support
@@ -31,19 +31,19 @@ For projects using a bundler (Vite, Webpack, Rollup, Parcel, etc.):
 
 ```bash
 # Using npm
-npm install chaikit
+npm install @chaikit/widget
 
 # Using pnpm
-pnpm add chaikit
+pnpm add @chaikit/widget
 
 # Using yarn
-yarn add chaikit
+yarn add @chaikit/widget
 ```
 
 ### Import in JavaScript or TypeScript
 
 ```ts
-import 'chaikit';
+import '@chaikit/widget';
 
 // Now <chai-support> is registered and available in your HTML / DOM
 ```
@@ -83,7 +83,7 @@ export function App() {
 
 If your website has strict CSP policies or offline requirements, host `chaikit.iife.js` directly:
 
-1. Download `chaikit.iife.js` from the release assets or copy from `node_modules/chaikit/dist/chaikit.iife.js`.
+1. Download `chaikit.iife.js` from the release assets or copy from `node_modules/@chaikit/widget/dist/chaikit.iife.js`.
 2. Place it in your public assets directory (e.g. `/assets/chaikit.iife.js`).
 3. Load it locally:
    ```html

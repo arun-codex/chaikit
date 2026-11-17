@@ -50,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Load ChaiKit script */}
         <Script
-          src="https://cdn.jsdelivr.net/npm/chaikit@1.0.0/dist/chaikit.iife.js"
+          src="https://cdn.jsdelivr.net/npm/@chaikit/widget@1.0.0/dist/chaikit.iife.js"
           strategy="lazyOnload"
         />
 

@@ -15,6 +15,7 @@
     "baseUrl": ".",
     "paths": {
       "@chaikit/core": ["packages/core/dist/index.d.ts"],
+      "@chaikit/widget": ["packages/widget/dist/index.d.ts"],
       "chaikit": ["packages/widget/dist/index.d.ts"]
     }
   }

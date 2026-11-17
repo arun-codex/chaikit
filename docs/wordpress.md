@@ -14,7 +14,7 @@ If your user account has administrator or editor privileges allowing custom HTML
 
 ```html
 <!-- Load ChaiKit -->
-<script defer src="https://cdn.jsdelivr.net/npm/chaikit@1.0.0/dist/chaikit.iife.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@chaikit/widget@1.0.0/dist/chaikit.iife.js"></script>
 
 <!-- Add ChaiKit Element -->
 <chai-support
@@ -37,7 +37,7 @@ Add this snippet to your theme's `functions.php`:
 ```php
 function enqueue_chaikit_widget() {
     ?>
-    <script defer src="https://cdn.jsdelivr.net/npm/chaikit@1.0.0/dist/chaikit.iife.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@chaikit/widget@1.0.0/dist/chaikit.iife.js"></script>
     <chai-support
         creator-name="<?php echo esc_attr(get_bloginfo('name')); ?>"
         upi-id="yourname@bank"

@@ -18,12 +18,12 @@ export default defineConfig({
       fileName: (format) => (format === 'es' ? 'index.js' : 'index.cjs'),
     },
     rollupOptions: {
-      external: ['react', 'react-dom', 'chaikit', '@chaikit/core'],
+      external: ['react', 'react-dom', '@chaikit/widget', '@chaikit/core'],
       output: {
         globals: {
           react: 'React',
           'react-dom': 'ReactDOM',
-          chaikit: 'ChaiKit',
+          '@chaikit/widget': 'ChaiKit',
           '@chaikit/core': 'ChaiKitCore',
         },
       },
