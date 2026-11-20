@@ -1,8 +1,16 @@
 import { defineConfig, devices } from '@playwright/test';
+import fs from 'fs';
 import path from 'path';
 
-const userProfile = process.env.USERPROFILE || 'C:\\Users\\dutch';
-const playwrightBrowsers = path.join(userProfile, 'AppData', 'Local', 'ms-playwright');
+const isWin = process.platform === 'win32';
+const userProfile = process.env.USERPROFILE || '';
+const winFirefox = isWin && userProfile && fs.existsSync(path.join(userProfile, 'AppData', 'Local', 'ms-playwright', 'firefox-1555', 'firefox', 'firefox.exe'))
+  ? path.join(userProfile, 'AppData', 'Local', 'ms-playwright', 'firefox-1555', 'firefox', 'firefox.exe')
+  : undefined;
+
+const winWebkit = isWin && userProfile && fs.existsSync(path.join(userProfile, 'AppData', 'Local', 'ms-playwright', 'webkit-2370', 'Playwright.exe'))
+  ? path.join(userProfile, 'AppData', 'Local', 'ms-playwright', 'webkit-2370', 'Playwright.exe')
+  : undefined;
 
 export default defineConfig({
   testDir: './e2e',
@@ -19,32 +27,28 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        channel: 'chrome',
+        ...(isWin ? { channel: 'chrome' } : {}),
       },
     },
     {
       name: 'firefox',
       use: {
         ...devices['Desktop Firefox'],
-        launchOptions: {
-          executablePath: path.join(playwrightBrowsers, 'firefox-1555', 'firefox', 'firefox.exe'),
-        },
+        ...(winFirefox ? { launchOptions: { executablePath: winFirefox } } : {}),
       },
     },
     {
       name: 'webkit',
       use: {
         ...devices['Desktop Safari'],
-        launchOptions: {
-          executablePath: path.join(playwrightBrowsers, 'webkit-2370', 'Playwright.exe'),
-        },
+        ...(winWebkit ? { launchOptions: { executablePath: winWebkit } } : {}),
       },
     },
     {
       name: 'mobile-chrome',
       use: {
         ...devices['Pixel 5'],
-        channel: 'chrome',
+        ...(isWin ? { channel: 'chrome' } : {}),
       },
     },
   ],
