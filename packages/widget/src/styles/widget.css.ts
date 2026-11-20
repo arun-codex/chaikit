@@ -502,6 +502,7 @@ export const WIDGET_STYLES = /* css */ `
 }
 
 .chai-qr-frame {
+  position: relative;
   background: var(--chai-qr-bg);
   padding: 10px;
   border-radius: 12px;
@@ -519,6 +520,31 @@ export const WIDGET_STYLES = /* css */ `
 .chai-qr-frame svg {
   display: block;
   border-radius: 6px;
+}
+
+.chai-demo-qr-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(27, 20, 16, 0.68);
+  border-radius: 12px;
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+}
+
+.chai-demo-tag {
+  background: #E9AE5B;
+  color: #1B1410;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 6px 12px;
+  border-radius: 999px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  text-transform: uppercase;
+  text-align: center;
 }
 
 .chai-qr-actions {

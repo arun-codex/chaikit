@@ -149,12 +149,30 @@ ChaiKit maintains strict transparency:
 
 ---
 
+## Interactive Playground & Visual Configurator
+
+ChaiKit includes an interactive visual configurator and developer showcase:
+
+```bash
+# Launch the live configurator & developer playground
+npm run dev:playground
+```
+
+Open `http://localhost:4173/examples/playground/index.html` in your browser to:
+- **Configure & Preview:** Adjust creator name, UPI ID, themes, placements, and tiers in real time.
+- **Simulated Host Site:** See ChaiKit embedded inside a realistic developer blog (*DevNotes*).
+- **Responsive Viewports:** Toggle seamlessly between Desktop (1440 × 900), Tablet (768 × 1024), and Mobile (390 × 844) preview frames.
+- **Safe Demo Mode:** Enabled by default with non-payable QR overlays to prevent accidental transfers during testing.
+- **Live Code Generator:** Copy customized, production-ready integration snippets for Plain HTML (CDN), React / Next.js, Vue 3, or WordPress.
+
+---
+
 ## Performance & Bundle Sizes
 
 | Artifact | Format | Uncompressed | Gzipped |
 | :--- | :--- | :--- | :--- |
-| `chaikit.iife.js` | Self-contained Browser Script | 76.64 kB | **22.07 kB** |
-| `chaikit.esm.js` | ES Module Package | 81.58 kB | **21.64 kB** |
+| `chaikit.iife.js` | Self-contained Browser Script | 77.05 kB | **22.28 kB** |
+| `chaikit.esm.js` | ES Module Package | 84.36 kB | **22.48 kB** |
 | `Chai3DView.js` | Optional 3D Module (Lazy-loaded) | 13.04 kB | **4.03 kB** |
 | `@chaikit/react` | React Wrapper | 13.48 kB | **4.02 kB** |
 | `@chaikit/core` | Core Engine | 27.90 kB | **9.43 kB** |
@@ -166,16 +184,18 @@ ChaiKit maintains strict transparency:
 ```
 chaikit/
   packages/
-    core/       # @chaikit/core: Validation, exact paise math, UPI URI, QR generator
-    widget/     # @chaikit/widget: Web Component <chai-support> (Shadow DOM, illustrations, themes)
-    react/      # @chaikit/react: React wrapper component (<ChaiSupport />)
+    core/         # @chaikit/core: Validation, exact paise math, UPI URI, QR generator
+    widget/       # @chaikit/widget: Web Component <chai-support> (Shadow DOM, illustrations, themes)
+    react/        # @chaikit/react: React wrapper component (<ChaiSupport />)
   examples/
-    vanilla-html/ # Interactive showcase with theme & event controls
+    playground/   # Interactive visual configurator, device switcher & code generator
+    showcase/     # Developer blog showcase & screenshot captures
+    vanilla-html/ # Interactive vanilla JavaScript integration
     react/        # React sandbox
     nextjs/       # Next.js App Router client boundary example
     vue/          # Vue 3 component example
     static-site/  # Jekyll, Hugo, GitHub Pages embed
-  docs/         # In-depth technical guides
+  docs/           # In-depth technical guides
 ```
 
 ---

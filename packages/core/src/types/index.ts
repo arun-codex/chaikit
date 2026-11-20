@@ -33,6 +33,7 @@ export interface ChaiKitConfig {
   maxAmountPaise?: number; // default: 1000000 (₹10,000)
   note?: string; // UPI transaction note
   headless?: boolean; // if true, suppresses floating button
+  demoMode?: boolean; // if true, displays non-payable demonstration preview
 }
 
 /**

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChaiKit Playground — Interactive Widget Configurator &amp; Live Showcase</title>
+  <meta name="description" content="Configure, preview, test, and generate code for the ChaiKit Buy Me a Chai UPI supporter widget.">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="pk-topbar" role="banner">
+    <div class="pk-topbar-brand">
+      <div class="pk-logo-mark" aria-hidden="true">
+        <!-- Chai Cup SVG Icon -->
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="rgba(246, 232, 210, 0.85)" stroke-width="1.6" stroke-linecap="round">
+            <path d="M12 9 Q10 5 12 1" />
+            <path d="M16 9 Q18 5 16 1" />
+          </g>
+          <ellipse cx="14" cy="21" rx="7.5" ry="1.6" fill="#E9AE5B" opacity="0.4" />
+          <path d="M7 10.5 H21 L19.2 18.5 C19 19.3 18.2 20 17.3 20 H10.7 C9.8 20 9 19.3 8.8 18.5 L7 10.5 Z" fill="#D97047" />
+          <ellipse cx="14" cy="10.5" rx="7" ry="1.8" fill="#C77D3D" />
+          <ellipse cx="14" cy="10.5" rx="7" ry="1.8" stroke="#F6E8D2" stroke-width="0.8" fill="none" opacity="0.8" />
+          <path d="M7 12 C4 12 4 17 7 17.5" stroke="#D97047" stroke-width="1.8" stroke-linecap="round" fill="none" />
+        </svg>
+      </div>
+      <div class="pk-brand-text">
+        <span class="pk-brand-title">ChaiKit</span>
+        <span class="pk-brand-badge">Playground</span>
+      </div>
+      <span class="pk-version-pill" title="Target Release Version">v1.0.0</span>
+    </div>
+
+    <!-- Responsive Viewport Switcher -->
+    <div class="pk-viewport-switcher" role="radiogroup" aria-label="Device Viewport Size">
+      <button type="button" class="pk-vp-btn active" data-viewport="desktop" aria-pressed="true" aria-label="Desktop Preview (1440x900)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+        <span>Desktop</span>
+      </button>
+      <button type="button" class="pk-vp-btn" data-viewport="tablet" aria-pressed="false" aria-label="Tablet Preview (768x1024)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+        <span>Tablet</span>
+      </button>
+      <button type="button" class="pk-vp-btn" data-viewport="mobile" aria-pressed="false" aria-label="Mobile Preview (390x844)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+        <span>Mobile</span>
+      </button>
+    </div>
+
+    <!-- Topbar Actions -->
+    <div class="pk-topbar-actions">
+      <button type="button" class="pk-btn-subtle" id="resetConfigBtn" title="Reset all settings to default">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+          <path d="M3 3v5h5"></path>
+        </svg>
+        <span>Reset</span>
+      </button>
+
+      <button type="button" class="pk-btn-primary" id="openCodeModalBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+        <span>Get Embed Code</span>
+      </button>
+
+      <a href="https://github.com/arun-codex/chaikit" target="_blank" rel="noopener noreferrer" class="pk-btn-icon" aria-label="GitHub Repository">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- ================= MAIN APP WORKSPACE ================= -->
+  <div class="pk-app-body">
+    <!-- ---------------- LEFT CONFIGURATOR SIDEBAR ---------------- -->
+    <aside class="pk-sidebar" aria-label="Widget Configuration Controls">
+      <div class="pk-sidebar-header">
+        <h2 class="pk-sidebar-title">Widget Configurator</h2>
+        <span class="pk-live-dot" title="Live reactive updates enabled"></span>
+      </div>
+
+      <div class="pk-sidebar-scroll">
+        <!-- SECTION 1: CREATOR PROFILE -->
+        <section class="pk-config-section">
+          <h3 class="pk-section-title">1. Creator Profile</h3>
+          
+          <div class="pk-field">
+            <label for="cfgCreatorName" class="pk-label">Creator Display Name</label>
+            <input type="text" id="cfgCreatorName" class="pk-input" value="Rohan Sen" placeholder="e.g. Aarav Sharma" maxlength="60">
+            <span class="pk-hint">Displayed in modal title e.g. "Buy Rohan Sen a Chai"</span>
+          </div>
+
+          <div class="pk-field">
+            <label for="cfgUpiId" class="pk-label">Recipient UPI ID (VPA)</label>
+            <input type="text" id="cfgUpiId" class="pk-input" value="rohan@okhdfcbank" placeholder="username@bank" maxlength="64">
+            <span class="pk-hint">Standard format: username@bank</span>
+          </div>
+
+          <div class="pk-field">
+            <label for="cfgDescription" class="pk-label">Support Description</label>
+            <textarea id="cfgDescription" class="pk-textarea" rows="2" placeholder="Enjoying my work? A little chai goes a long way!">Enjoying my open-source projects? A little chai goes a long way!</textarea>
+          </div>
+
+          <div class="pk-field">
+            <label for="cfgNote" class="pk-label">UPI Transaction Note</label>
+            <input type="text" id="cfgNote" class="pk-input" value="Chai for Rohan Sen" placeholder="Chai for creator">
+          </div>
+        </section>
+
+        <!-- SECTION 2: THEME & APPEARANCE -->
+        <section class="pk-config-section">
+          <h3 class="pk-section-title">2. Theme &amp; Styling</h3>
+          <div class="pk-theme-grid" role="radiogroup" aria-label="Widget Theme">
+            <button type="button" class="pk-theme-card active" data-theme="classic" role="radio" aria-checked="true">
+              <span class="pk-swatch swatch-classic"></span>
+              <span class="pk-theme-name">Classic Chai</span>
+            </button>
+            <button type="button" class="pk-theme-card" data-theme="dark" role="radio" aria-checked="false">
+              <span class="pk-swatch swatch-dark"></span>
+              <span class="pk-theme-name">Dark Espresso</span>
+            </button>
+            <button type="button" class="pk-theme-card" data-theme="cream" role="radio" aria-checked="false">
+              <span class="pk-swatch swatch-cream"></span>
+              <span class="pk-theme-name">Cream</span>
+            </button>
+            <button type="button" class="pk-theme-card" data-theme="minimal" role="radio" aria-checked="false">
+              <span class="pk-swatch swatch-minimal"></span>
+              <span class="pk-theme-name">Minimal</span>
+            </button>
+            <button type="button" class="pk-theme-card" data-theme="auto" role="radio" aria-checked="false">
+              <span class="pk-swatch swatch-auto"></span>
+              <span class="pk-theme-name">Auto (System)</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- SECTION 3: PLACEMENT & MODE -->
+        <section class="pk-config-section">
+          <h3 class="pk-section-title">3. Placement &amp; Mode</h3>
+          <div class="pk-field">
+            <label class="pk-label">Position Mode</label>
+            <div class="pk-radio-group">
+              <label class="pk-radio-label">
+                <input type="radio" name="positionMode" value="bottom-right" checked>
+                <span>Floating (Bottom-Right)</span>
+              </label>
+              <label class="pk-radio-label">
+                <input type="radio" name="positionMode" value="bottom-left">
+                <span>Floating (Bottom-Left)</span>
+              </label>
+              <label class="pk-radio-label">
+                <input type="radio" name="positionMode" value="inline">
+                <span>Inline Card (Embedded in content)</span>
+              </label>
+              <label class="pk-radio-label">
+                <input type="radio" name="positionMode" value="headless">
+                <span>Headless (Custom Trigger Button)</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 4: CHAI TIERS EDITOR -->
+        <section class="pk-config-section">
+          <div class="pk-section-header">
+            <h3 class="pk-section-title">4. Contribution Tiers</h3>
+            <button type="button" class="pk-btn-text" id="resetTiersBtn">Reset Tiers</button>
+          </div>
+          
+          <div class="pk-tiers-list">
+            <div class="pk-tier-row" data-tier-id="cutting">
+              <span class="pk-tier-badge">Tier 1</span>
+              <input type="text" class="pk-input pk-tier-name" value="Cutting Chai" aria-label="Tier 1 Name">
+              <div class="pk-input-addon">
+                <span>₹</span>
+                <input type="number" class="pk-input pk-tier-amt" value="10" min="1" max="10000" aria-label="Tier 1 Amount in Rupees">
+              </div>
+            </div>
+
+            <div class="pk-tier-row" data-tier-id="kadak">
+              <span class="pk-tier-badge">Tier 2</span>
+              <input type="text" class="pk-input pk-tier-name" value="Kadak Chai" aria-label="Tier 2 Name">
+              <div class="pk-input-addon">
+                <span>₹</span>
+                <input type="number" class="pk-input pk-tier-amt" value="25" min="1" max="10000" aria-label="Tier 2 Amount in Rupees">
+              </div>
+            </div>
+
+            <div class="pk-tier-row" data-tier-id="tandoori">
+              <span class="pk-tier-badge">Tier 3</span>
+              <input type="text" class="pk-input pk-tier-name" value="Tandoori Chai" aria-label="Tier 3 Name">
+              <div class="pk-input-addon">
+                <span>₹</span>
+                <input type="number" class="pk-input pk-tier-amt" value="50" min="1" max="10000" aria-label="Tier 3 Amount in Rupees">
+              </div>
+            </div>
+
+            <div class="pk-tier-row" data-tier-id="premium">
+              <span class="pk-tier-badge">Tier 4</span>
+              <input type="text" class="pk-input pk-tier-name" value="Premium Chai" aria-label="Tier 4 Name">
+              <div class="pk-input-addon">
+                <span>₹</span>
+                <input type="number" class="pk-input pk-tier-amt" value="100" min="1" max="10000" aria-label="Tier 4 Amount in Rupees">
+              </div>
+            </div>
+          </div>
+
+          <div class="pk-field" style="margin-top: 12px;">
+            <label for="cfgDefaultTier" class="pk-label">Default Selected Tier</label>
+            <select id="cfgDefaultTier" class="pk-select">
+              <option value="cutting">Cutting Chai (₹10)</option>
+              <option value="kadak" selected>Kadak Chai (₹25)</option>
+              <option value="tandoori">Tandoori Chai (₹50)</option>
+              <option value="premium">Premium Chai (₹100)</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- SECTION 5: BUTTON & CUSTOM ACCENT -->
+        <section class="pk-config-section">
+          <h3 class="pk-section-title">5. Floating Launcher Button</h3>
+          
+          <div class="pk-field">
+            <label for="cfgButtonText" class="pk-label">Button Text</label>
+            <input type="text" id="cfgButtonText" class="pk-input" value="Buy Me a Chai ☕">
+          </div>
+
+          <div class="pk-field">
+            <label for="cfgAccentColor" class="pk-label">Accent Color</label>
+            <div class="pk-color-picker-row">
+              <input type="color" id="cfgAccentColor" class="pk-color-input" value="#E9AE5B">
+              <input type="text" id="cfgAccentColorText" class="pk-input pk-color-hex" value="#E9AE5B">
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 6: MOTION & 3D -->
+        <section class="pk-config-section">
+          <h3 class="pk-section-title">6. Motion &amp; 3D Visuals</h3>
+          
+          <div class="pk-field">
+            <label class="pk-toggle-label">
+              <input type="checkbox" id="cfgEnable3D">
+              <span class="pk-toggle-slider"></span>
+              <span class="pk-toggle-text">
+                <strong>Enable 3D Chai Stage</strong>
+                <small>Interactive WebGL procedural cup in modal</small>
+              </span>
+            </label>
+          </div>
+        </section>
+
+        <!-- SECTION 7: PAYMENT SAFETY SIMULATION -->
+        <section class="pk-config-section pk-safety-section">
+          <h3 class="pk-section-title">7. Payment Simulation Mode</h3>
+          
+          <div class="pk-field">
+            <label class="pk-toggle-label">
+              <input type="checkbox" id="cfgDemoMode" checked>
+              <span class="pk-toggle-slider"></span>
+              <span class="pk-toggle-text">
+                <strong>Safe Demo Mode (Recommended)</strong>
+                <small>Non-payable QR overlay; disables real app handoff</small>
+              </span>
+            </label>
+          </div>
+
+          <div class="pk-safety-banner" id="safetyNotice">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span>Demo Mode is active. Safe for public exploration &amp; testing. No live money transfers will be initiated.</span>
+          </div>
+        </section>
+      </div>
+    </aside>
+
+    <!-- ---------------- RIGHT PREVIEW WORKSPACE ---------------- -->
+    <main class="pk-preview-workspace" role="main">
+      <!-- Device Canvas Container -->
+      <div class="pk-device-container" id="deviceContainer" data-viewport="desktop">
+        <!-- Device Frame Bar -->
+        <div class="pk-device-bar">
+          <div class="pk-device-dots" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="pk-device-url">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span id="deviceUrlDisplay">https://devnotes.io/articles/modern-web-components</span>
+          </div>
+          <div class="pk-device-meta">
+            <span id="viewportDimensionsLabel">1440 &times; 900</span>
+          </div>
+        </div>
+
+        <!-- Simulated Authentic Host Website (DevNotes) -->
+        <div class="pk-preview-content" id="previewSite">
+          <!-- DevNotes Website Navbar -->
+          <nav class="devnotes-nav" aria-label="DevNotes Site Navigation">
+            <div class="devnotes-logo">
+              <span class="logo-icon">&#x26A1;</span>
+              <strong>DevNotes</strong>
+            </div>
+            <div class="devnotes-nav-links">
+              <a href="#articles">Articles</a>
+              <a href="#projects">Projects</a>
+              <a href="#about">About</a>
+            </div>
+          </nav>
+
+          <!-- DevNotes Hero -->
+          <section class="devnotes-hero">
+            <span class="devnotes-tag">Architecture &amp; Engineering</span>
+            <h1 class="devnotes-heading">Building Better Software, One Project at a Time.</h1>
+            <p class="devnotes-subheading">
+              In-depth essays on web performance, zero-dependency engineering, and crafting delightful developer tooling.
+            </p>
+            <div class="devnotes-author-meta">
+              <div class="devnotes-avatar">RS</div>
+              <div>
+                <strong>Rohan Sen</strong>
+                <small>Staff Systems Engineer &amp; Open Source Author</small>
+              </div>
+            </div>
+          </section>
+
+          <!-- DevNotes Featured Projects -->
+          <section class="devnotes-projects">
+            <h2 class="devnotes-section-heading">Featured Open Source</h2>
+            <div class="devnotes-grid">
+              <div class="devnotes-card">
+                <span class="card-tag">TypeScript</span>
+                <h3>TurboCache</h3>
+                <p>Distributed zero-latency in-memory cache engine for Edge and Node runtimes.</p>
+                <div class="card-footer">&star; 4.8k GitHub stars</div>
+              </div>
+              <div class="devnotes-card">
+                <span class="card-tag">Rust &amp; WASM</span>
+                <h3>MicroQuery</h3>
+                <p>High-throughput columnar analytical query engine compiled to WebAssembly.</p>
+                <div class="card-footer">&star; 2.3k GitHub stars</div>
+              </div>
+              <div class="devnotes-card">
+                <span class="card-tag">Web Component</span>
+                <h3>ChaiKit Widget</h3>
+                <p>Universal Buy Me a Chai embeddable UPI widget for creators in India.</p>
+                <div class="card-footer">&star; Just Released</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- DevNotes Article & Inline Mount Target -->
+          <section class="devnotes-article">
+            <h2>Designing Zero-Dependency Web Components</h2>
+            <p>
+              When building embeddable widgets for the open web, every kilobyte matters. By building on standard Web Components, Shadow DOM, and native modern APIs, we eliminate framework lock-in and avoid polluting host styling.
+            </p>
+            <p>
+              Whether installed via a simple version-pinned CDN script tag or imported as a typed React component, the end-user experience remains smooth, encapsulated, and instantaneous.
+            </p>
+
+            <!-- Inline Widget Target Section -->
+            <div class="devnotes-support-box" id="inlineTargetWrapper">
+              <h3>Support My Work</h3>
+              <p>If these guides and open-source tools save you time, consider buying me a cup of chai!</p>
+              <div id="inlineMountPoint" class="devnotes-inline-slot">
+                <!-- <chai-support position="inline"> will mount here when inline mode is selected -->
+              </div>
+            </div>
+
+            <!-- Headless Trigger Button Section -->
+            <div class="devnotes-headless-box" id="headlessTriggerWrapper" style="display: none;">
+              <p><strong>Headless Mode Active:</strong> Trigger the real modal using your custom site button:</p>
+              <button type="button" class="devnotes-custom-btn" id="customHeadlessTriggerBtn">
+                &#x2615; Support Rohan Sen (Custom Site Button)
+              </button>
+            </div>
+          </section>
+
+          <!-- DevNotes Footer -->
+          <footer class="devnotes-footer">
+            <p>&copy; 2026 Rohan Sen. Built with passion for open-source software and Indian craftsmanship.</p>
+          </footer>
+        </div>
+
+        <!-- ---------------- THE ACTUAL CHAIKIT WIDGET ---------------- -->
+        <!-- Loaded directly as the real custom element <chai-support> -->
+        <chai-support
+          id="liveChaiWidget"
+          creator-name="Rohan Sen"
+          upi-id="rohan@okhdfcbank"
+          description="Enjoying my open-source projects? A little chai goes a long way!"
+          theme="classic"
+          position="bottom-right"
+          button-text="Buy Me a Chai ☕"
+          demo-mode>
+        </chai-support>
+      </div>
+
+      <!-- ---------------- EVENT LOG & TELEMETRY PANEL ---------------- -->
+      <div class="pk-telemetry-panel" id="telemetryPanel">
+        <div class="pk-telemetry-header">
+          <div class="pk-telemetry-title">
+            <span class="pk-pulse-dot"></span>
+            <strong>Live Widget Events</strong>
+            <small id="telemetryCount">(0 events)</small>
+          </div>
+          <button type="button" class="pk-btn-text" id="clearTelemetryBtn">Clear</button>
+        </div>
+        <div class="pk-telemetry-log" id="telemetryLog" role="log" aria-live="polite">
+          <div class="pk-log-entry pk-log-init">
+            <span class="pk-log-time">Now</span>
+            <span class="pk-log-tag">READY</span>
+            <span class="pk-log-msg">ChaiKit &lt;chai-support&gt; Web Component registered and ready.</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ================= EMBED CODE MODAL ================= -->
+  <div class="pk-modal-backdrop" id="codeModalBackdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="codeModalTitle">
+    <div class="pk-code-modal">
+      <div class="pk-code-modal-header">
+        <div>
+          <h2 id="codeModalTitle" class="pk-code-modal-title">Installation &amp; Integration Code</h2>
+          <p class="pk-code-modal-subtitle">Copy working integration snippets customized with your current settings.</p>
+        </div>
+        <button type="button" class="pk-btn-close" id="closeCodeModalBtn" aria-label="Close Code Dialog">&times;</button>
+      </div>
+
+      <!-- Code Tabs -->
+      <div class="pk-code-tabs" role="tablist">
+        <button type="button" class="pk-code-tab active" data-tab="html" role="tab" aria-selected="true">HTML (CDN)</button>
+        <button type="button" class="pk-code-tab" data-tab="react" role="tab" aria-selected="false">React / Next.js</button>
+        <button type="button" class="pk-code-tab" data-tab="vue" role="tab" aria-selected="false">Vue 3</button>
+        <button type="button" class="pk-code-tab" data-tab="wordpress" role="tab" aria-selected="false">WordPress / Static</button>
+      </div>
+
+      <!-- Code Snippet Container -->
+      <div class="pk-code-body">
+        <div class="pk-code-actions">
+          <span class="pk-code-lang" id="codeLangBadge">HTML</span>
+          <button type="button" class="pk-btn-copy" id="copyCodeBtn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="copyBtnText">Copy Code</span>
+          </button>
+        </div>
+        <pre class="pk-code-pre"><code id="codeSnippetContent"></code></pre>
+      </div>
+
+      <div class="pk-code-modal-footer">
+        <p class="pk-code-note">
+          <strong>Tip:</strong> The script embeds with zero external runtime dependencies and isolated Shadow DOM styles.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load the real ChaiKit Web Component from distribution -->
+  <script src="../../packages/widget/dist/chaikit.iife.js"></script>
+  <!-- Load the playground controller application -->
+  <script src="./app.js"></script>
+</body>
+</html>

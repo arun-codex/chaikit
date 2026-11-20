@@ -65,6 +65,8 @@ export class TierSelector {
       const card = document.createElement('button');
       card.type = 'button';
       card.className = 'chai-tier-card';
+      card.setAttribute('data-tier', tier.id);
+      card.setAttribute('data-tier-id', tier.id);
       const isSelected = tier.id === this.options.selectedTierId;
       if (isSelected) {
         card.classList.add('selected');

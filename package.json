@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "typecheck": "tsc -b packages/core packages/widget packages/react",
+    "dev:playground": "node e2e/server.mjs",
     "lint": "echo \"Linting check passed\"",
     "clean": "node -e \"const fs=require('fs'); ['packages/core/dist','packages/widget/dist','packages/react/dist'].forEach(d => fs.rmSync(d, {recursive:true, force:true}))\""
   },

@@ -17,6 +17,7 @@ export interface PaymentPanelOptions {
   upiId: string;
   amountPaise: number;
   note?: string;
+  demoMode?: boolean;
   onCopySuccess: (text: string) => void;
   onHandoffAttempt: (uri: string) => void;
 }
@@ -52,12 +53,16 @@ export class PaymentPanel {
     }
 
     try {
-      this.upiUri = buildUpiUri({
-        upiId: this.options.upiId,
-        creatorName: this.options.creatorName,
-        amountPaise,
-        note: this.options.note,
-      });
+      if (this.options.demoMode) {
+        this.upiUri = `upi://pay?pa=demo@chaikit.preview&pn=${encodeURIComponent(this.options.creatorName || 'Demo Creator')}&am=${(amountPaise / 100).toFixed(2)}&cu=INR&tn=ChaiKit%20Demo%20Preview`;
+      } else {
+        this.upiUri = buildUpiUri({
+          upiId: this.options.upiId,
+          creatorName: this.options.creatorName,
+          amountPaise,
+          note: this.options.note,
+        });
+      }
 
       const qrSvg = generateQrSvg(this.upiUri, {
         size: 190,
@@ -66,7 +71,16 @@ export class PaymentPanel {
         background: '#FFFFFF',
       });
 
-      this.qrFrameEl.innerHTML = qrSvg;
+      if (this.options.demoMode) {
+        this.qrFrameEl.innerHTML = /* html */ `
+          ${qrSvg}
+          <div class="chai-demo-qr-overlay">
+            <span class="chai-demo-tag">DEMO QR &bull; NON-PAYABLE</span>
+          </div>
+        `;
+      } else {
+        this.qrFrameEl.innerHTML = qrSvg;
+      }
     } catch {
       this.qrFrameEl.innerHTML = '<div style="padding: 20px; color: #EF4444;">Could not generate QR. Please check UPI configuration.</div>';
     }
@@ -208,6 +222,11 @@ export class PaymentPanel {
     `;
     openAppBtn.addEventListener('click', () => {
       if (!this.upiUri) return;
+      if (this.options.demoMode) {
+        this.options.onCopySuccess('Demo Mode: Live UPI payment intent is disabled in demonstration preview.');
+        this.options.onHandoffAttempt('demo://non-payable-preview');
+        return;
+      }
       this.options.onHandoffAttempt(this.upiUri);
       attemptUpiHandoff(this.upiUri);
     });
@@ -216,9 +235,15 @@ export class PaymentPanel {
     // Transparent, Honest Payment Disclaimer
     const disclaimer = document.createElement('div');
     disclaimer.className = 'chai-disclaimer';
-    disclaimer.innerHTML = /* html */ `
-      Complete payment in Google Pay, PhonePe, Paytm, or BHIM. Direct P2P transfer &mdash; <strong>verify recipient name before confirming</strong> in your UPI app.
-    `;
+    if (this.options.demoMode) {
+      disclaimer.innerHTML = /* html */ `
+        <span style="color: var(--chai-accent); font-weight: 700;">Demo Mode Active:</span> Safe demonstration preview. Live UPI app handoff & payments are disabled.
+      `;
+    } else {
+      disclaimer.innerHTML = /* html */ `
+        Complete payment in Google Pay, PhonePe, Paytm, or BHIM. Direct P2P transfer &mdash; <strong>verify recipient name before confirming</strong> in your UPI app.
+      `;
+    }
     container.appendChild(disclaimer);
 
     const amountLabel = amountWrapper.querySelector('.chai-payment-amount') as HTMLElement;

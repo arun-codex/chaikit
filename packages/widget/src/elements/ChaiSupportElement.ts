@@ -42,6 +42,9 @@ export class ChaiSupportElement extends SafeHTMLElement {
       'default-tier',
       'note',
       'enable-3d',
+      'demo-mode',
+      'tiers',
+      'suggested-amounts',
     ];
   }
 
@@ -155,6 +158,36 @@ export class ChaiSupportElement extends SafeHTMLElement {
     const note = this.getAttribute('note') || this.config.note;
     const defaultTierId = this.getAttribute('default-tier') || this.config.defaultTierId;
     const enable3D = this.hasAttribute('enable-3d') || Boolean(this.config.enable3D);
+    const demoMode = this.hasAttribute('demo-mode') || Boolean(this.config.demoMode);
+
+    let parsedTiers = this.config.tiers;
+    const tiersAttr = this.getAttribute('tiers');
+    if (tiersAttr) {
+      try {
+        parsedTiers = JSON.parse(tiersAttr);
+      } catch (err) {
+        console.warn('ChaiKit: Could not parse tiers JSON attribute', err);
+      }
+    } else {
+      const suggestedAttr = this.getAttribute('suggested-amounts');
+      if (suggestedAttr) {
+        const amounts = suggestedAttr
+          .split(',')
+          .map((s) => parseInt(s.trim(), 10) * 100)
+          .filter((n) => !isNaN(n) && n > 0);
+        if (amounts.length > 0) {
+          const tierIcons = ['cutting', 'kadak', 'tandoori', 'premium'];
+          const tierNames = ['Cutting Chai', 'Kadak Chai', 'Tandoori Chai', 'Premium Chai'];
+          parsedTiers = amounts.slice(0, 4).map((amt, idx) => ({
+            id: tierIcons[idx] || `tier-${idx + 1}`,
+            name: tierNames[idx] || `Chai Tier ${idx + 1}`,
+            amountPaise: amt,
+            icon: tierIcons[idx] || 'kadak',
+            description: `Support with ${formatRupees(amt)}`,
+          }));
+        }
+      }
+    }
 
     const minAttr = this.getAttribute('min-amount');
     const maxAttr = this.getAttribute('max-amount');
@@ -174,6 +207,8 @@ export class ChaiSupportElement extends SafeHTMLElement {
       note,
       defaultTierId,
       enable3D,
+      demoMode,
+      tiers: parsedTiers,
       minAmountPaise,
       maxAmountPaise,
     };
@@ -223,6 +258,7 @@ export class ChaiSupportElement extends SafeHTMLElement {
       maxAmountPaise: this.config.maxAmountPaise,
       note: this.config.note,
       enable3D: this.config.enable3D,
+      demoMode: this.config.demoMode,
       isInline,
       onClose: () => this.close(),
       onTierSelected: (tier: ChaiTier) => {

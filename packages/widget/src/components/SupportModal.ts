@@ -27,6 +27,7 @@ export interface SupportModalOptions {
   note?: string;
   enable3D?: boolean;
   isInline?: boolean;
+  demoMode?: boolean;
   onClose: () => void;
   onTierSelected: (tier: ChaiTier) => void;
   onAmountChanged: (amountPaise: number) => void;
@@ -90,6 +91,7 @@ export class SupportModal {
       upiId: this.options.upiId,
       amountPaise: this.currentAmountPaise,
       note: this.options.note,
+      demoMode: this.options.demoMode,
       onCopySuccess: (msg) => this.toast.show(msg),
       onHandoffAttempt: (uri) => this.options.onHandoffAttempt(uri),
     });
