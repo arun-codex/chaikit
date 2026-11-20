@@ -1083,6 +1083,45 @@ body {
   padding: 4px;
 }
 
+.pk-release-notice-banner {
+  background: rgba(199, 139, 82, 0.12);
+  border: 1px solid rgba(233, 174, 91, 0.35);
+  border-radius: var(--pk-radius-sm);
+  padding: 10px 14px;
+  margin: 12px 0 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pk-release-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  background: var(--pk-saffron);
+  color: var(--pk-espresso);
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.pk-release-text {
+  font-size: 0.78rem;
+  color: var(--pk-cream);
+  line-height: 1.45;
+  margin: 0;
+}
+
+.pk-release-text code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: var(--pk-saffron);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 .pk-btn-close:hover {
   color: var(--pk-text-bright);
 }
@@ -1185,8 +1224,15 @@ body {
 /* ================= 6. RESPONSIVE BREAKPOINTS ================= */
 @media (max-width: 1024px) {
   body {
-    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
     height: auto;
+  }
+
+  .pk-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
   }
 
   .pk-app-body {
@@ -1194,17 +1240,53 @@ body {
     height: auto;
   }
 
-  .pk-sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--pk-border);
-  }
-
+  /* Live preview workspace comes first so mobile visitors see the widget immediately */
   .pk-preview-workspace {
-    padding: 16px;
+    order: 1;
+    width: 100%;
+    padding: 12px;
+    z-index: 10;
   }
 
   .pk-device-container {
-    height: 700px;
+    height: 600px;
+    max-width: 100%;
+  }
+
+  .pk-sidebar {
+    order: 2;
+    width: 100%;
+    border-right: none;
+    border-top: 1px solid var(--pk-border);
+    z-index: 5;
+  }
+
+  .pk-telemetry-panel {
+    order: 3;
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .pk-topbar {
+    padding: 0 10px;
+    height: auto;
+    min-height: 56px;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .pk-device-container {
+    height: 540px;
+  }
+
+  .pk-vp-btn span {
+    display: none;
+  }
+
+  .pk-vp-btn {
+    padding: 6px 10px;
   }
 }

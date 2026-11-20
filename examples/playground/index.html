@@ -446,6 +446,12 @@
         <button type="button" class="pk-btn-close" id="closeCodeModalBtn" aria-label="Close Code Dialog">&times;</button>
       </div>
 
+      <!-- Release Status Notice -->
+      <div class="pk-release-notice-banner" role="status">
+        <span class="pk-release-badge">RELEASE STATUS: v1.0.0 CANDIDATE</span>
+        <p class="pk-release-text">npm packages (<code>@chaikit/widget</code>, <code>@chaikit/react</code>) are prepared for public release following scope verification. For local testing or pre-release installation, download <code>chaikit.iife.js</code> from GitHub Releases or build from source.</p>
+      </div>
+
       <!-- Code Tabs -->
       <div class="pk-code-tabs" role="tablist">
         <button type="button" class="pk-code-tab active" data-tab="html" role="tab" aria-selected="true">HTML (CDN)</button>
@@ -478,7 +484,7 @@
   </div>
 
   <!-- Load the real ChaiKit Web Component from distribution -->
-  <script src="../../packages/widget/dist/chaikit.iife.js"></script>
+  <script src="./chaikit.iife.js"></script>
   <!-- Load the playground controller application -->
   <script src="./app.js"></script>
 </body>

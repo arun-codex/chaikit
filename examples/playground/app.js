@@ -537,24 +537,37 @@
     const is3D = state.enable3D ? '\n  enable-3d' : '';
     const isHeadless = state.position === 'headless' ? '\n  headless' : '';
 
+    // Check if tiers are customized
+    const defaultTiers = DEFAULT_CONFIG.tiers;
+    const isTiersCustomized = JSON.stringify(state.tiers) !== JSON.stringify(defaultTiers);
+    const tiersAttr = isTiersCustomized ? `\n  tiers='${JSON.stringify(state.tiers).replace(/'/g, '&#39;')}'` : '';
+
     if (tab === 'html') {
-      lang = 'HTML';
-      code = `<!-- 1. Include ChaiKit Universal Web Component (single script tag) -->
+      lang = 'HTML (Universal Embed)';
+      code = `<!-- ================= CHAIKIT SUPPORTER WIDGET ================= -->
+<!-- Release Status: v1.0.0 Candidate (Pending npm Registry Indexation) -->
+<!-- Pre-Release / Self-Hosted: Include chaikit.iife.js from GitHub Releases -->
+<!-- Production CDN: https://cdn.jsdelivr.net/npm/@chaikit/widget@1.0.0/dist/chaikit.iife.js -->
 <script defer src="https://cdn.jsdelivr.net/npm/@chaikit/widget@1.0.0/dist/chaikit.iife.js"></script>
 
-<!-- 2. Add the custom element anywhere in your page -->
+<!-- Note: demo-mode is omitted here so your live supporters can pay via direct UPI.
+     To test safely in staging environments, add the 'demo-mode' attribute. -->
 <chai-support
   creator-name="${creator}"
   upi-id="${upi}"
   theme="${theme}"
   position="${pos}"
   button-text="${btnText}"
-  accent-color="${accent}"${is3D}${isHeadless}>
+  accent-color="${accent}"${is3D}${isHeadless}${tiersAttr}>
 </chai-support>`;
     } else if (tab === 'react') {
-      lang = 'TypeScript / JSX';
-      code = `// 1. Install React wrapper package:
-// npm install @chaikit/react@1.0.0
+      lang = 'TypeScript / React / Next.js';
+      code = `// ================= CHAIKIT REACT INTEGRATION =================
+// Release Status: v1.0.0 Candidate. Install once published to npm:
+// npm install @chaikit/react
+// (Or test pre-release: npm install github:arun-codex/chaikit#packages/react)
+
+'use client'; // Required for Next.js App Router
 
 import React from 'react';
 import { ChaiSupport } from '@chaikit/react';
@@ -568,22 +581,23 @@ export default function SupporterWidget() {
       position="${pos}"
       buttonText="${btnText}"
       accentColor="${accent}"${state.enable3D ? '\n      enable3D={true}' : ''}${state.position === 'headless' ? '\n      headless={true}' : ''}
-      onTierSelected={(tier) => console.log('Supporter selected:', tier.name)}
-      onHandoffAttempt={(uri) => console.log('Payment initiated:', uri)}
+      onTierSelected={(tier) => console.log('Chai tier selected:', tier.name)}
+      onHandoffAttempt={(uri) => console.log('UPI payment initiated:', uri)}
     />
   );
 }`;
     } else if (tab === 'vue') {
       lang = 'Vue 3 Single File Component';
-      code = `<template>
-  <!-- In Vue 3, register <chai-support> as custom element -->
+      code = `<!-- ================= CHAIKIT VUE 3 INTEGRATION ================= -->
+<!-- Release Status: v1.0.0 Candidate. Install once published: npm install @chaikit/widget -->
+<template>
   <chai-support
     creator-name="${creator}"
     upi-id="${upi}"
     theme="${theme}"
     position="${pos}"
     button-text="${btnText}"
-    accent-color="${accent}"${is3D}${isHeadless}
+    accent-color="${accent}"${is3D}${isHeadless}${tiersAttr}
   />
 </template>
 
@@ -591,20 +605,22 @@ export default function SupporterWidget() {
 import { onMounted } from 'vue';
 
 onMounted(async () => {
-  // Dynamically import the Web Component
+  // Dynamically import the ChaiKit Web Component
   await import('@chaikit/widget');
 });
 </script>`;
     } else if (tab === 'wordpress') {
       lang = 'WordPress / Static CMS';
-      code = `<!-- Add this snippet to Header/Footer scripts in WordPress / Hugo / Jekyll / Ghost -->
+      code = `<!-- ================= CHAIKIT WORDPRESS / STATIC SITE ================= -->
+<!-- Add to Theme Settings -> Header/Footer Scripts or Custom HTML block -->
 <script defer src="https://cdn.jsdelivr.net/npm/@chaikit/widget@1.0.0/dist/chaikit.iife.js"></script>
 
 <chai-support
   creator-name="${creator}"
   upi-id="${upi}"
   theme="${theme}"
-  position="${pos}">
+  position="${pos}"
+  button-text="${btnText}"${is3D}>
 </chai-support>`;
     }
 

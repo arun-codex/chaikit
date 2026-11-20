@@ -612,6 +612,21 @@ export const WIDGET_STYLES = /* css */ `
   outline-offset: 2px;
 }
 
+.chai-btn-demo-disabled {
+  background: var(--chai-surface) !important;
+  color: var(--chai-text-muted) !important;
+  border: 1px dashed var(--chai-border-hover) !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+}
+
+.chai-btn-demo-disabled:hover {
+  background: var(--chai-surface-hover) !important;
+  color: var(--chai-text) !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 .chai-upi-details {
   display: flex;
   align-items: center;

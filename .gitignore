@@ -4,6 +4,8 @@ node_modules/
 
 # Build artifacts
 dist/
+dist-pages/
+examples/playground/chaikit.iife.js
 build/
 *.tsbuildinfo
 

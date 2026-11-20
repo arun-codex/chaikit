@@ -30,11 +30,11 @@ export function generateQrSvg(data: string, options: QrOptions = {}): string {
     whiteColor: background,
   });
 
-  // Ensure width/height attributes are set on root svg element
+  // Ensure width/height attributes are set on root svg element without duplicating viewBox
   if (svg.startsWith('<svg')) {
     return svg.replace(
       '<svg',
-      `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges" aria-label="UPI Payment QR Code" role="img"`
+      `<svg width="${size}" height="${size}" shape-rendering="crispEdges" aria-label="UPI Payment QR Code" role="img"`
     );
   }
 

@@ -3,6 +3,52 @@
 > **Add a beautiful "Buy Me a Chai" supporter widget to any website.**  
 > An open-source, lightweight, customizable widget powered by direct UPI payments.
 
+[![CI Status](https://github.com/arun-codex/chaikit/actions/workflows/ci.yml/badge.svg)](https://github.com/arun-codex/chaikit/actions/workflows/ci.yml)
+[![Pages Status](https://github.com/arun-codex/chaikit/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/arun-codex/chaikit/actions/workflows/deploy-pages.yml)
+[![Live Showcase](https://img.shields.io/badge/Live_Showcase-GitHub_Pages-E9AE5B?logo=github)](https://arun-codex.github.io/chaikit/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+---
+
+## 🌐 Live Interactive Playground
+
+**Try the live configurator and widget on desktop or mobile:**  
+👉 **[https://arun-codex.github.io/chaikit/](https://arun-codex.github.io/chaikit/)**
+
+- **Live Preview:** Real `<chai-support>` web component running inside a realistic developer blog layout (*DevNotes*).
+- **Responsive Viewports:** Instant switching between Desktop, Tablet, and Mobile preview frames.
+- **Visual Configurator:** Customize creator name, UPI ID, themes, placements, custom tiers, and buttons in real time.
+- **Safe Demo Mode:** Enabled by default on public showcases with non-payable QR placeholders and disabled payment app intents.
+- **Code Generator:** 1-click customized code generation for Plain HTML (CDN), React / Next.js, Vue 3, and WordPress.
+
+---
+
+## 📸 Visual Showcase & Screenshot Gallery
+
+| Desktop Showcase & Configurator | Support Modal with Live Steam |
+| :---: | :---: |
+| ![Desktop Showcase](examples/playground/screenshots/01_desktop_showcase.png) | ![Support Modal](examples/playground/screenshots/02_open_support_modal.png) |
+
+| Tier 1: Cutting Chai (₹10) | Tier 2: Kadak Chai (₹25) |
+| :---: | :---: |
+| ![Cutting Chai](examples/playground/screenshots/03_cutting_chai_selected.png) | ![Kadak Chai](examples/playground/screenshots/04_kadak_chai_selected.png) |
+
+| Tier 3: Tandoori Kulhad (₹50) | Tier 4: Royal Premium Chai (₹100) |
+| :---: | :---: |
+| ![Tandoori Chai](examples/playground/screenshots/05_tandoori_chai_selected.png) | ![Premium Chai](examples/playground/screenshots/06_premium_chai_selected.png) |
+
+| Warm Cream Theme | Dark Roaster Theme |
+| :---: | :---: |
+| ![Cream Theme](examples/playground/screenshots/07_cream_theme.png) | ![Dark Theme](examples/playground/screenshots/08_dark_theme.png) |
+
+| Mobile Modal Responsive Layout | Safe Demo QR (Non-payable) |
+| :---: | :---: |
+| ![Mobile Modal](examples/playground/screenshots/09_mobile_support_modal.png) | ![Safe Demo Mode](examples/playground/screenshots/10_upi_demo_payment_layout.png) |
+
+| Optional Procedural 3D Stage | Live Visual Configurator & Telemetry |
+| :---: | :---: |
+| ![3D Kulhad Stage](examples/playground/screenshots/11_optional_3d_stage.png) | ![Complete Configurator](examples/playground/screenshots/12_complete_visual_configurator.png) |
+
 ---
 
 ## Why ChaiKit?
@@ -14,8 +60,8 @@ Most creator support widgets are built for Western payment gateways or require c
 - **Universal:** Works in plain HTML, React, Next.js, Vue, Svelte, Astro, WordPress, Jekyll, Hugo, and static sites.
 - **Zero Middlemen & Zero Fees:** 100% of contributions go directly to your configured UPI ID.
 - **No Backend Required:** Self-contained client-side library. Runs on static websites and GitHub Pages.
-- **Lightweight (~22 KB gzipped):** The entire standalone browser bundle — including all vector illustrations, steam animation physics, themes, and client-side QR engine — is **22.07 KB gzipped** (well below the 50 KB budget).
-- **Optional 3D Visuals:** Procedural 3D clay kulhad mode (**4.03 KB gzipped**), lazy-loaded on demand with zero heavy external 3D engine dependencies.
+- **Lightweight (~22 KB gzipped):** The entire standalone browser bundle — including all vector illustrations, steam animation physics, themes, and client-side QR engine — is **22.63 KB gzipped** (well below the 50 KB budget).
+- **Optional 3D Visuals:** Procedural 3D clay kulhad mode (**3.93 KB gzipped**), lazy-loaded on demand with zero heavy external 3D engine dependencies.
 - **Privacy-First:** Zero analytics, zero cookies, zero external network requests.
 - **Accessible (WCAG 2.2 AA):** Fully keyboard navigable, modal focus-trapped, screen-reader friendly, and respects reduced-motion preferences.
 - **Payment Truthful:** Never fakes transaction verification, receipts, or supporter counters.
@@ -62,6 +108,8 @@ npm install @chaikit/react
 ```
 
 ```tsx
+'use client';
+
 import { ChaiSupport } from '@chaikit/react';
 
 export function Header() {
@@ -128,6 +176,7 @@ Supporters can also enter any custom amount between ₹10 and ₹10,000 (configu
 | `position` | `'bottom-right' \| 'bottom-left' \| 'inline'` | `'bottom-right'` | Placement on screen or inline flow. |
 | `accent-color` | `string` | Theme default | Custom accent color override. |
 | `enable-3d` | `boolean` | `false` | Enables optional 3D kulhad viewport. |
+| `demo-mode` | `boolean` | `false` | Enables safe demonstration preview (non-payable QR, disabled intent). |
 | `headless` | `boolean` | `false` | Suppresses floating button for custom triggers. |
 | `min-amount` | `number` | `10` | Minimum custom contribution in ₹. |
 | `max-amount` | `number` | `10000` | Maximum custom contribution in ₹. |
@@ -169,13 +218,14 @@ Open `http://localhost:4173/examples/playground/index.html` in your browser to:
 
 ## Performance & Bundle Sizes
 
-| Artifact | Format | Uncompressed | Gzipped |
-| :--- | :--- | :--- | :--- |
-| `chaikit.iife.js` | Self-contained Browser Script | 77.05 kB | **22.28 kB** |
-| `chaikit.esm.js` | ES Module Package | 84.36 kB | **22.48 kB** |
-| `Chai3DView.js` | Optional 3D Module (Lazy-loaded) | 13.04 kB | **4.03 kB** |
-| `@chaikit/react` | React Wrapper | 13.48 kB | **4.02 kB** |
-| `@chaikit/core` | Core Engine | 27.90 kB | **9.43 kB** |
+| Artifact | Format | Uncompressed | Gzipped | Budget Status |
+| :--- | :--- | :--- | :--- | :--- |
+| `chaikit.iife.js` | Self-contained Browser Script | 78.61 kB | **22.63 kB** | ✅ Passed (&lt; 50 KB) |
+| `chaikit.esm.js` | ES Module Package | 84.05 kB | **22.28 kB** | ✅ Passed |
+| `chaikit.cjs` | CommonJS Package | 70.23 kB | **19.85 kB** | ✅ Passed |
+| `Chai3DView.js` | Optional 3D Module (Lazy-loaded) | 12.74 kB | **3.93 kB** | ✅ Passed |
+| `@chaikit/react` | React Wrapper Component | 13.17 kB | **3.92 kB** | ✅ Passed |
+| `@chaikit/core` | Core Engine & QR Generator | 27.22 kB | **9.20 kB** | ✅ Passed |
 
 ---
 
@@ -206,13 +256,13 @@ chaikit/
 # Install dependencies
 npm install --ignore-scripts
 
-# Run test suite (Vitest unit tests)
+# Run test suite (Vitest unit & component tests)
 npm test
 
-# Run browser tests (Playwright across Chromium, Firefox, WebKit, Mobile Chrome)
+# Run browser tests (Playwright across Chromium, Firefox, Mobile Chrome)
 npm run test:e2e
 
-# Build all packages
+# Build all packages & compile GitHub Pages artifact
 npm run build
 ```
 
@@ -220,4 +270,4 @@ npm run build
 
 ## License
 
-[MIT](file:///C:/User/OnlyChai/LICENSE) © 2026 ChaiKit Contributors
+[MIT](LICENSE) © 2026 ChaiKit Contributors

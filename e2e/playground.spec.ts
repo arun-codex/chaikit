@@ -73,18 +73,24 @@ test.describe('ChaiKit Interactive Playground & Visual Configurator', () => {
   test('3. Theme switching updates widget and captures Cream & Dark themes', async ({ page }) => {
     const widget = page.locator('#liveChaiWidget');
 
-    // Open modal first
-    await widget.locator('.chai-launcher-btn').click();
-    await expect(widget.locator('.chai-modal')).toBeVisible();
-
-    // 1. Switch to Cream Theme
+    // 1. Switch to Cream Theme in configurator
     await page.locator('.pk-theme-card[data-theme="cream"]').click();
     await expect(widget).toHaveAttribute('theme', 'cream');
-    await page.screenshot({ path: path.join(screenshotsDir, '07_cream_theme.png') });
 
-    // 2. Switch to Dark Theme
+    // Open modal to view Cream theme
+    await widget.locator('.chai-launcher-btn').click();
+    await expect(widget.locator('.chai-modal')).toBeVisible();
+    await page.screenshot({ path: path.join(screenshotsDir, '07_cream_theme.png') });
+    await widget.locator('.chai-close-btn').click();
+    await expect(widget.locator('.chai-backdrop')).not.toHaveClass(/open/);
+
+    // 2. Switch to Dark Theme in configurator
     await page.locator('.pk-theme-card[data-theme="dark"]').click();
     await expect(widget).toHaveAttribute('theme', 'dark');
+
+    // Open modal to view Dark theme
+    await widget.locator('.chai-launcher-btn').click();
+    await expect(widget.locator('.chai-modal')).toBeVisible();
     await page.screenshot({ path: path.join(screenshotsDir, '08_dark_theme.png') });
   });
 
@@ -108,26 +114,67 @@ test.describe('ChaiKit Interactive Playground & Visual Configurator', () => {
     // Verify demo overlay is rendered
     const demoOverlay = widget.locator('.chai-demo-qr-overlay');
     await expect(demoOverlay).toBeVisible();
-    await expect(demoOverlay).toContainText('DEMO QR • NON-PAYABLE');
+    await expect(demoOverlay).toContainText('DEMO ONLY • NON-PAYABLE');
 
     // Verify demo disclaimer
     const disclaimer = widget.locator('.chai-disclaimer');
-    await expect(disclaimer).toContainText('Demo Mode Active');
+    await expect(disclaimer).toContainText('DEMO ONLY • NO PAYMENTS');
+
+    // Verify primary button has demo disabled state
+    const handoffBtn = widget.locator('.chai-btn-primary');
+    await expect(handoffBtn).toHaveClass(/chai-btn-demo-disabled/);
+    await expect(handoffBtn).toContainText('Demo Only — No Payments');
 
     // Click handoff button -> triggers demo toast instead of intent
-    const handoffBtn = widget.locator('.chai-btn-primary');
     await handoffBtn.click();
     const toast = widget.locator('.chai-toast');
     await expect(toast).toBeVisible();
     await expect(toast).toContainText('Demo Mode: Live UPI payment intent is disabled');
 
+    // Click Copy UPI ID button -> blocked in demo mode
+    const copyBtn = widget.locator('.chai-qr-actions .chai-btn-secondary').first();
+    await copyBtn.click();
+    await expect(toast).toContainText('Demo Mode: Live UPI transfers are disabled');
+
+    // Optically decode QR code from browser Shadow DOM SVG
+    await page.addScriptTag({ path: 'node_modules/jsqr/dist/jsQR.js' });
+    const decodedPayload = await page.evaluate(async () => {
+      const host = document.getElementById('liveChaiWidget');
+      const svg = host?.shadowRoot?.querySelector('.chai-qr-frame svg');
+      if (!svg) return null;
+      const xml = new XMLSerializer().serializeToString(svg);
+      const blob = new Blob([xml], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const img = new Image();
+      await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = url; });
+      const canvas = document.createElement('canvas');
+      canvas.width = 300;
+      canvas.height = 300;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return null;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, 300, 300);
+      ctx.drawImage(img, 0, 0, 300, 300);
+      const imgData = ctx.getImageData(0, 0, 300, 300);
+      const qrResult = (window as any).jsQR(imgData.data, 300, 300);
+      return qrResult ? qrResult.data : null;
+    });
+
+    expect(decodedPayload).toBeTruthy();
+    expect(decodedPayload).not.toContain('upi://');
+    expect(decodedPayload).not.toContain('pa=');
+    expect(decodedPayload).toBe('https://arun-codex.github.io/chaikit/#demo-preview-non-payable');
+
     await page.screenshot({ path: path.join(screenshotsDir, '10_upi_demo_payment_layout.png') });
   });
 
   test('6. 3D procedural chai cup can be toggled', async ({ page }) => {
-    // Enable 3D in configurator via force check (custom slider)
-    const toggle3D = page.locator('#cfgEnable3D');
-    await toggle3D.check({ force: true });
+    // Enable 3D in configurator
+    await page.evaluate(() => {
+      const el = document.getElementById('cfgEnable3D') as HTMLInputElement;
+      el.checked = true;
+      el.dispatchEvent(new Event('change', { bubbles: true }));
+    });
 
     const widget = page.locator('#liveChaiWidget');
     await expect(widget).toHaveAttribute('enable-3d', '');
@@ -154,6 +201,11 @@ test.describe('ChaiKit Interactive Playground & Visual Configurator', () => {
     await page.locator('#openCodeModalBtn').click();
     const codeModal = page.locator('#codeModalBackdrop');
     await expect(codeModal).toHaveClass(/open/);
+
+    // Verify release status banner is present
+    const notice = page.locator('.pk-release-notice-banner');
+    await expect(notice).toBeVisible();
+    await expect(notice).toContainText('v1.0.0 CANDIDATE');
 
     const codePre = page.locator('#codeSnippetContent');
     await expect(codePre).toContainText('creator-name="Ananya Verma"');

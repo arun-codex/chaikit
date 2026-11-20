@@ -12,6 +12,8 @@ import {
   svgToDataUrl,
 } from '@chaikit/core';
 
+export const DEMO_NON_PAYABLE_PAYLOAD = 'https://arun-codex.github.io/chaikit/#demo-preview-non-payable';
+
 export interface PaymentPanelOptions {
   creatorName: string;
   upiId: string;
@@ -53,8 +55,11 @@ export class PaymentPanel {
     }
 
     try {
+      let qrPayload: string;
       if (this.options.demoMode) {
-        this.upiUri = `upi://pay?pa=demo@chaikit.preview&pn=${encodeURIComponent(this.options.creatorName || 'Demo Creator')}&am=${(amountPaise / 100).toFixed(2)}&cu=INR&tn=ChaiKit%20Demo%20Preview`;
+        // SECURE DEMO MODE: No payable UPI URI is EVER generated or stored!
+        this.upiUri = '';
+        qrPayload = DEMO_NON_PAYABLE_PAYLOAD;
       } else {
         this.upiUri = buildUpiUri({
           upiId: this.options.upiId,
@@ -62,9 +67,10 @@ export class PaymentPanel {
           amountPaise,
           note: this.options.note,
         });
+        qrPayload = this.upiUri;
       }
 
-      const qrSvg = generateQrSvg(this.upiUri, {
+      const qrSvg = generateQrSvg(qrPayload, {
         size: 190,
         margin: 3,
         foreground: '#1B1410',
@@ -75,7 +81,7 @@ export class PaymentPanel {
         this.qrFrameEl.innerHTML = /* html */ `
           ${qrSvg}
           <div class="chai-demo-qr-overlay">
-            <span class="chai-demo-tag">DEMO QR &bull; NON-PAYABLE</span>
+            <span class="chai-demo-tag">DEMO ONLY &bull; NON-PAYABLE</span>
           </div>
         `;
       } else {
@@ -151,10 +157,17 @@ export class PaymentPanel {
     `;
 
     const upiWrapper = document.createElement('div');
-    upiWrapper.innerHTML = /* html */ `
-      <span class="chai-upi-label">UPI ID: </span>
-      <span class="chai-upi-value">${this.options.upiId}</span>
-    `;
+    if (this.options.demoMode) {
+      upiWrapper.innerHTML = /* html */ `
+        <span class="chai-upi-label">Status: </span>
+        <span class="chai-upi-value chai-demo-status" style="color: var(--chai-accent); font-weight: 700;">Demo Only &bull; Non-payable</span>
+      `;
+    } else {
+      upiWrapper.innerHTML = /* html */ `
+        <span class="chai-upi-label">UPI ID: </span>
+        <span class="chai-upi-value">${this.options.upiId}</span>
+      `;
+    }
 
     details.appendChild(amountWrapper);
     details.appendChild(upiWrapper);
@@ -168,7 +181,7 @@ export class PaymentPanel {
     const copyUpiBtn = document.createElement('button');
     copyUpiBtn.type = 'button';
     copyUpiBtn.className = 'chai-btn-secondary';
-    copyUpiBtn.setAttribute('aria-label', `Copy UPI ID: ${this.options.upiId}`);
+    copyUpiBtn.setAttribute('aria-label', this.options.demoMode ? 'Copying disabled in demo mode' : `Copy UPI ID: ${this.options.upiId}`);
     copyUpiBtn.innerHTML = /* html */ `
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -177,6 +190,10 @@ export class PaymentPanel {
       <span>Copy UPI ID</span>
     `;
     copyUpiBtn.addEventListener('click', async () => {
+      if (this.options.demoMode) {
+        this.options.onCopySuccess('Demo Mode: Live UPI transfers are disabled. No payment destination copied.');
+        return;
+      }
       await this.copyText(this.options.upiId, 'UPI ID copied to clipboard!');
     });
     actions.appendChild(copyUpiBtn);
@@ -195,6 +212,10 @@ export class PaymentPanel {
       <span>Save QR</span>
     `;
     downloadQrBtn.addEventListener('click', () => {
+      if (this.options.demoMode) {
+        this.options.onCopySuccess('Demo Mode: Saving disabled. This is a non-payable demo QR.');
+        return;
+      }
       if (!this.upiUri) return;
       const qrSvg = generateQrSvg(this.upiUri, { size: 300 });
       const dataUrl = svgToDataUrl(qrSvg);
@@ -212,21 +233,33 @@ export class PaymentPanel {
     const openAppBtn = document.createElement('button');
     openAppBtn.type = 'button';
     openAppBtn.className = 'chai-btn-primary';
-    openAppBtn.setAttribute('aria-label', 'Open UPI payment in installed mobile app');
-    openAppBtn.innerHTML = /* html */ `
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
-        <line x1="12" y1="18" x2="12.01" y2="18"></line>
-      </svg>
-      <span>${isMobile ? 'Open in UPI App' : 'Pay via UPI App'}</span>
-    `;
+    if (this.options.demoMode) {
+      openAppBtn.classList.add('chai-btn-demo-disabled');
+      openAppBtn.setAttribute('aria-label', 'UPI payments disabled in demonstration mode');
+      openAppBtn.innerHTML = /* html */ `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
+        </svg>
+        <span>Demo Only &mdash; No Payments</span>
+      `;
+    } else {
+      openAppBtn.setAttribute('aria-label', 'Open UPI payment in installed mobile app');
+      openAppBtn.innerHTML = /* html */ `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+        <span>${isMobile ? 'Open in UPI App' : 'Pay via UPI App'}</span>
+      `;
+    }
     openAppBtn.addEventListener('click', () => {
-      if (!this.upiUri) return;
       if (this.options.demoMode) {
         this.options.onCopySuccess('Demo Mode: Live UPI payment intent is disabled in demonstration preview.');
         this.options.onHandoffAttempt('demo://non-payable-preview');
         return;
       }
+      if (!this.upiUri) return;
       this.options.onHandoffAttempt(this.upiUri);
       attemptUpiHandoff(this.upiUri);
     });
@@ -237,7 +270,8 @@ export class PaymentPanel {
     disclaimer.className = 'chai-disclaimer';
     if (this.options.demoMode) {
       disclaimer.innerHTML = /* html */ `
-        <span style="color: var(--chai-accent); font-weight: 700;">Demo Mode Active:</span> Safe demonstration preview. Live UPI app handoff & payments are disabled.
+        <div class="chai-demo-tag" style="display:inline-block; font-size:10px; padding:3px 8px; margin-bottom:5px;">DEMO ONLY &bull; NO PAYMENTS</div>
+        <p style="margin:0; font-size:12px; line-height:1.4;">Safe demonstration preview. Real bank transfers, live payment app intents, and real UPI IDs are completely disabled.</p>
       `;
     } else {
       disclaimer.innerHTML = /* html */ `
