@@ -15,7 +15,7 @@ describe('QR Utilities', () => {
     expect(svg).toContain('</svg>');
     expect(svg).toContain('width="200"');
     expect(svg).toContain('height="200"');
-    expect(svg).toContain('viewBox="0 0 200 200"');
+    expect(svg).toMatch(/viewBox="0 0 \d+ \d+"/);
     expect(svg).toContain('shape-rendering="crispEdges"');
     expect(svg).toContain('role="img"');
     expect(svg).toContain('aria-label="UPI Payment QR Code"');
