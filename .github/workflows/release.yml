@@ -125,21 +125,14 @@ jobs:
 
       # Publication order is strictly sequential: Core -> Widget -> React
       # Fails immediately if any step fails (set -e).
-      # Uses OIDC Trusted Publishing with provenance. If NPM_TOKEN secret is configured,
-      # it provides fallback authentication for initial bootstrapping before trusted publishing is configured.
+      # Uses native OIDC Trusted Publishing with provenance (no static tokens).
       - name: Publish @chaikit/core (Tier 1 Engine)
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish -w packages/core --provenance --access public
 
       - name: Publish @chaikit/widget (Tier 2 Web Component & CDN Script)
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish -w packages/widget --provenance --access public
 
       - name: Publish @chaikit/react (Tier 3 React Adapter)
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish -w packages/react --provenance --access public
 
   github-release:
