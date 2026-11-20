@@ -51,6 +51,12 @@
   const viewportDimensionsLabel = document.getElementById('viewportDimensionsLabel');
   const safetyNotice = document.getElementById('safetyNotice');
 
+  // Guide Modal Elements
+  const guideModalBackdrop = document.getElementById('guideModalBackdrop');
+  const openGuideBtn = document.getElementById('openGuideBtn');
+  const closeGuideModalBtn = document.getElementById('closeGuideModalBtn');
+  const guideAcknowledgeBtn = document.getElementById('guideAcknowledgeBtn');
+
   // Input Elements
   const inpCreatorName = document.getElementById('cfgCreatorName');
   const inpUpiId = document.getElementById('cfgUpiId');
@@ -83,7 +89,9 @@
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        state = { ...DEFAULT_CONFIG, ...parsed };
+        // Security safeguard: demoMode is permanently locked to true on public showcase
+        delete parsed.demoMode;
+        state = { ...DEFAULT_CONFIG, ...parsed, demoMode: true };
       }
     } catch {
       // Ignore localStorage errors
@@ -95,7 +103,8 @@
    */
   function savePersistedConfig() {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      const toSave = { ...state, demoMode: true };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
     } catch {
       // Ignore localStorage errors
     }
@@ -232,13 +241,15 @@
       logEvent('3D_MODE', state.enable3D ? 'Enabled 3D WebGL procedural chai stage.' : 'Disabled 3D mode (using vector fallback).');
     });
 
-    // Demo Mode Toggle
-    inpDemoMode.addEventListener('change', (e) => {
-      state.demoMode = e.target.checked;
-      updateSafetyNotice();
-      updateLiveWidget();
-      logEvent('SAFETY', state.demoMode ? 'Safe Demo Mode enabled (non-payable preview).' : 'Developer Test Mode enabled (live UPI QR active).');
-    });
+    // Demo Mode Toggle (if present in custom/dev environments)
+    if (inpDemoMode) {
+      inpDemoMode.addEventListener('change', (e) => {
+        state.demoMode = e.target.checked;
+        updateSafetyNotice();
+        updateLiveWidget();
+        logEvent('SAFETY', state.demoMode ? 'Safe Demo Mode enabled (non-payable preview).' : 'Developer Test Mode enabled.');
+      });
+    }
 
     // Viewport switcher buttons
     document.querySelectorAll('.pk-vp-btn').forEach((btn) => {
@@ -262,6 +273,24 @@
     document.getElementById('closeCodeModalBtn').addEventListener('click', closeCodeModal);
     codeModalBackdrop.addEventListener('click', (e) => {
       if (e.target === codeModalBackdrop) closeCodeModal();
+    });
+
+    // Guide Modal
+    if (openGuideBtn) openGuideBtn.addEventListener('click', openGuideModal);
+    if (closeGuideModalBtn) closeGuideModalBtn.addEventListener('click', closeGuideModal);
+    if (guideAcknowledgeBtn) guideAcknowledgeBtn.addEventListener('click', closeGuideModal);
+    if (guideModalBackdrop) {
+      guideModalBackdrop.addEventListener('click', (e) => {
+        if (e.target === guideModalBackdrop) closeGuideModal();
+      });
+    }
+
+    // Escape key closes modals
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeCodeModal();
+        closeGuideModal();
+      }
     });
 
     document.querySelectorAll('.pk-code-tab').forEach((tab) => {
@@ -340,7 +369,7 @@
     inpAccentColor.value = state.accentColor;
     inpAccentColorText.value = state.accentColor;
     inpEnable3D.checked = state.enable3D;
-    inpDemoMode.checked = state.demoMode;
+    if (inpDemoMode) inpDemoMode.checked = state.demoMode;
     inpDefaultTier.value = state.defaultTier;
 
     // Theme cards
@@ -371,25 +400,13 @@
   }
 
   function updateSafetyNotice() {
-    if (state.demoMode) {
-      safetyNotice.innerHTML = /* html */ `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-        </svg>
-        <span><strong>Demo Mode Active:</strong> Safe for public exploration &amp; testing. Non-payable QR overlay; live payment intents disabled.</span>
-      `;
-      safetyNotice.style.borderColor = 'rgba(233, 174, 91, 0.4)';
-    } else {
-      safetyNotice.innerHTML = /* html */ `
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-          <line x1="12" y1="9" x2="12" y2="13"></line>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-        <span style="color: #FCA5A5;"><strong>Developer Test Mode:</strong> Live UPI URI and QR will be generated using "${escapeHtml(state.upiId)}". Test carefully.</span>
-      `;
-      safetyNotice.style.borderColor = 'rgba(239, 68, 68, 0.5)';
-    }
+    safetyNotice.innerHTML = /* html */ `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+      <span><strong>Safe Demo Safeguard Active:</strong> Non-payable QR overlay active. Live UPI intents and payment handoffs are permanently disabled on this public showcase.</span>
+    `;
+    safetyNotice.style.borderColor = 'rgba(233, 174, 91, 0.4)';
   }
 
   let debounceTimer = null;
@@ -457,11 +474,8 @@
       widget.removeAttribute('enable-3d');
     }
 
-    if (state.demoMode) {
-      widget.setAttribute('demo-mode', '');
-    } else {
-      widget.removeAttribute('demo-mode');
-    }
+    // Safety guarantee: public showcase is permanently locked to demo-mode
+    widget.setAttribute('demo-mode', '');
 
     // Set custom tiers
     try {
@@ -521,6 +535,22 @@
   function closeCodeModal() {
     codeModalBackdrop.classList.remove('open');
     codeModalBackdrop.setAttribute('aria-hidden', 'true');
+  }
+
+  /**
+   * Creator Setup Guide Modal
+   */
+  function openGuideModal() {
+    if (!guideModalBackdrop) return;
+    guideModalBackdrop.classList.add('open');
+    guideModalBackdrop.setAttribute('aria-hidden', 'false');
+    logEvent('GUIDE', 'Opened creator onboarding & setup walkthrough.');
+  }
+
+  function closeGuideModal() {
+    if (!guideModalBackdrop) return;
+    guideModalBackdrop.classList.remove('open');
+    guideModalBackdrop.setAttribute('aria-hidden', 'true');
   }
 
   function renderGeneratedCode() {

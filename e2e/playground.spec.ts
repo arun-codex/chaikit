@@ -231,4 +231,84 @@ test.describe('ChaiKit Interactive Playground & Visual Configurator', () => {
     await page.locator('#copyCodeBtn').click();
     await expect(page.locator('#copyBtnText')).toHaveText(/Copied/);
   });
+
+  test('8. Public showcase demo safeguard is permanently locked against tampering', async ({ page }) => {
+    // 1. Verify permanent non-interactive safeguard badge exists
+    const safeguardBadge = page.locator('#publicSafeguardBadge');
+    await expect(safeguardBadge).toBeVisible();
+    await expect(safeguardBadge).toContainText('Demo Safeguard Active');
+    await expect(safeguardBadge).toContainText('Permanently Locked');
+
+    // Verify there is no toggle or checkbox to disable demo mode
+    await expect(page.locator('#cfgDemoMode')).toHaveCount(0);
+
+    // 2. Attempt to bypass demo mode by setting localStorage with demoMode: false
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'chaikit_playground_config_v1',
+        JSON.stringify({ demoMode: false, creatorName: 'Malicious Attacker' })
+      );
+    });
+
+    // Reload page to verify safeguard resilience
+    await page.reload();
+    await page.waitForLoadState('networkidle');
+
+    const widget = page.locator('#liveChaiWidget');
+    // Ensure demo-mode is still strictly applied
+    await expect(widget).toHaveAttribute('demo-mode', '');
+
+    // Open modal and verify non-payable safeguards remain 100% active
+    await widget.locator('.chai-launcher-btn').click();
+    await expect(widget.locator('.chai-demo-qr-overlay')).toBeVisible();
+    await expect(widget.locator('.chai-btn-primary')).toHaveClass(/chai-btn-demo-disabled/);
+  });
+
+  test('9. Creator Setup Guide walkthrough displays 7 steps, callouts, and closes properly', async ({ page }) => {
+    const guideBtn = page.locator('#openGuideBtn');
+    await expect(guideBtn).toBeVisible();
+    await guideBtn.click();
+
+    const guideModal = page.locator('#guideModalBackdrop');
+    await expect(guideModal).toHaveClass(/open/);
+    await expect(guideModal).toBeVisible();
+
+    // Verify header and badge
+    await expect(guideModal.locator('.pk-guide-header-badge')).toContainText('CREATOR QUICKSTART');
+    await expect(guideModal.locator('#guideModalTitle')).toContainText('Creator Onboarding & Setup Guide');
+
+    // Verify critical callouts (UPI Privacy & Direct P2P)
+    const privacyCallout = guideModal.locator('.pk-callout-privacy');
+    await expect(privacyCallout).toBeVisible();
+    await expect(privacyCallout).toContainText('UPI Address Visibility');
+
+    const directCallout = guideModal.locator('.pk-callout-direct');
+    await expect(directCallout).toBeVisible();
+    await expect(directCallout).toContainText('100% Direct P2P — Zero Gateway Fees');
+
+    // Verify all 7 steps are present
+    const steps = guideModal.locator('.pk-step-item');
+    await expect(steps).toHaveCount(7);
+    await expect(steps.nth(0)).toContainText('Enter Creator Name & Note');
+    await expect(steps.nth(1)).toContainText('Enter & Verify Your UPI ID (VPA)');
+    await expect(steps.nth(2)).toContainText('Customize Contribution Tiers');
+    await expect(steps.nth(3)).toContainText('Select Theme & Placement');
+    await expect(steps.nth(4)).toContainText('Preview Across Viewports');
+    await expect(steps.nth(5)).toContainText('Copy Integration Code');
+    await expect(steps.nth(6)).toContainText('Perform a ₹1 Pre-Launch Self-Test');
+
+    // Capture screenshot of guide
+    await page.screenshot({ path: path.join(screenshotsDir, '13_creator_setup_guide.png') });
+
+    // Test acknowledge button dismisses modal
+    const ackBtn = page.locator('#guideAcknowledgeBtn');
+    await ackBtn.click();
+    await expect(guideModal).not.toHaveClass(/open/);
+
+    // Test reopening and dismissing with Escape key
+    await guideBtn.click();
+    await expect(guideModal).toHaveClass(/open/);
+    await page.keyboard.press('Escape');
+    await expect(guideModal).not.toHaveClass(/open/);
+  });
 });

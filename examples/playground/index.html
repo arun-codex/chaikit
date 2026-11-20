@@ -60,6 +60,15 @@
 
     <!-- Topbar Actions -->
     <div class="pk-topbar-actions">
+      <button type="button" class="pk-btn-subtle" id="openGuideBtn" aria-label="Open Creator Setup Guide">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+          <line x1="12" y1="17" x2="12.01" y2="17"></line>
+        </svg>
+        <span>Setup Guide</span>
+      </button>
+
       <button type="button" class="pk-btn-subtle" id="resetConfigBtn" title="Reset all settings to default">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
@@ -264,26 +273,29 @@
           </div>
         </section>
 
-        <!-- SECTION 7: PAYMENT SAFETY SIMULATION -->
+        <!-- SECTION 7: PAYMENT SAFETY SAFEGUARD -->
         <section class="pk-config-section pk-safety-section">
-          <h3 class="pk-section-title">7. Payment Simulation Mode</h3>
+          <h3 class="pk-section-title">7. Payment Safety Safeguard</h3>
           
-          <div class="pk-field">
-            <label class="pk-toggle-label">
-              <input type="checkbox" id="cfgDemoMode" checked>
-              <span class="pk-toggle-slider"></span>
-              <span class="pk-toggle-text">
-                <strong>Safe Demo Mode (Recommended)</strong>
-                <small>Non-payable QR overlay; disables real app handoff</small>
-              </span>
-            </label>
+          <div class="pk-safety-badge-card" id="publicSafeguardBadge">
+            <div class="pk-safeguard-status">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <strong>Demo Safeguard Active</strong>
+              <span class="pk-safeguard-pill">Permanently Locked</span>
+            </div>
+            <p class="pk-safeguard-desc">
+              Real UPI contributions are enabled when you install ChaiKit on your own website. Public showcase payments are permanently disabled for your security.
+            </p>
           </div>
 
           <div class="pk-safety-banner" id="safetyNotice">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
-            <span>Demo Mode is active. Safe for public exploration &amp; testing. No live money transfers will be initiated.</span>
+            <span><strong>Safe Demo Mode:</strong> Non-payable QR overlay active. No live money transfers, copy intents, or banking app handoffs can occur.</span>
           </div>
         </section>
       </div>
@@ -479,6 +491,109 @@
         <p class="pk-code-note">
           <strong>Tip:</strong> The script embeds with zero external runtime dependencies and isolated Shadow DOM styles.
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= CREATOR SETUP GUIDE MODAL ================= -->
+  <div class="pk-modal-backdrop" id="guideModalBackdrop" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="guideModalTitle">
+    <div class="pk-code-modal pk-guide-modal">
+      <div class="pk-code-modal-header">
+        <div>
+          <div class="pk-guide-header-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+            <span>CREATOR QUICKSTART</span>
+          </div>
+          <h2 id="guideModalTitle" class="pk-code-modal-title">Creator Onboarding &amp; Setup Guide</h2>
+          <p class="pk-code-modal-subtitle">7 simple steps to configure, test, and embed ChaiKit on your website.</p>
+        </div>
+        <button type="button" class="pk-btn-close" id="closeGuideModalBtn" aria-label="Close Setup Guide">&times;</button>
+      </div>
+
+      <div class="pk-guide-body">
+        <!-- Critical Callouts -->
+        <div class="pk-guide-callouts">
+          <div class="pk-callout-card pk-callout-privacy">
+            <div class="pk-callout-icon" aria-hidden="true">🔒</div>
+            <div class="pk-callout-content">
+              <strong>UPI Address Visibility:</strong>
+              <p>Your UPI ID (VPA) is a public address included in the page markup so supporters' banking apps can resolve the recipient. For privacy, we recommend setting up a dedicated creator/business UPI handle (e.g. <code>projectname@okhdfcbank</code>) rather than sharing your personal mobile phone VPA.</p>
+            </div>
+          </div>
+
+          <div class="pk-callout-card pk-callout-direct">
+            <div class="pk-callout-icon" aria-hidden="true">⚡</div>
+            <div class="pk-callout-content">
+              <strong>100% Direct P2P — Zero Gateway Fees:</strong>
+              <p>ChaiKit connects supporters directly to your bank account via standard NPCI UPI rails. There is no middleman gateway, no transaction commission, and no escrow. Because transactions occur peer-to-peer on static frontends, no bank webhooks are triggered.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7-Step Walkthrough -->
+        <div class="pk-guide-steps">
+          <div class="pk-step-item">
+            <div class="pk-step-num">1</div>
+            <div class="pk-step-info">
+              <h4 class="pk-step-title">Enter Creator Name &amp; Note</h4>
+              <p class="pk-step-desc">Set your display name (e.g., "Rohan Sen"). This appears in the floating launcher button and modal header ("Buy Rohan Sen a Chai"). Set a short note like "Chai for Rohan Sen" for payment narration.</p>
+            </div>
+          </div>
+
+          <div class="pk-step-item">
+            <div class="pk-step-num">2</div>
+            <div class="pk-step-info">
+              <h4 class="pk-step-title">Enter &amp; Verify Your UPI ID (VPA)</h4>
+              <p class="pk-step-desc">Provide your valid Virtual Payment Address (e.g., <code>username@bank</code> or <code>brand@upi</code>). ChaiKit strictly validates the format before generating the UPI intent URI.</p>
+            </div>
+          </div>
+
+          <div class="pk-step-item">
+            <div class="pk-step-num">3</div>
+            <div class="pk-step-info">
+              <h4 class="pk-step-title">Customize Contribution Tiers</h4>
+              <p class="pk-step-desc">Default tiers are Cutting (₹10), Kadak (₹25), Tandoori (₹50), and Premium (₹100). You can customize tier names, amounts, and default selection in the configurator, or let supporters enter a custom amount.</p>
+            </div>
+          </div>
+
+          <div class="pk-step-item">
+            <div class="pk-step-num">4</div>
+            <div class="pk-step-info">
+              <h4 class="pk-step-title">Select Theme &amp; Placement</h4>
+              <p class="pk-step-desc">Choose from Classic Chai, Dark Espresso, Cream, Minimal, or Auto (matches OS dark/light mode). Choose between floating launcher, inline content embed, or headless custom button.</p>
+            </div>
+          </div>
+
+          <div class="pk-step-item">
+            <div class="pk-step-num">5</div>
+            <div class="pk-step-info">
+              <h4 class="pk-step-title">Preview Across Viewports</h4>
+              <p class="pk-step-desc">Use the Desktop, Tablet, and Mobile switcher in the topbar to verify how the modal, steam animation, and QR code adapt to mobile touchscreens and smaller viewports.</p>
+            </div>
+          </div>
+
+          <div class="pk-step-item">
+            <div class="pk-step-num">6</div>
+            <div class="pk-step-info">
+              <h4 class="pk-step-title">Copy Integration Code</h4>
+              <p class="pk-step-desc">Click "Get Embed Code" to get copy-paste ready code. Notice that <code>demo-mode</code> is omitted in the generated code so your real website visitors can initiate direct UPI payments.</p>
+            </div>
+          </div>
+
+          <div class="pk-step-item">
+            <div class="pk-step-num">7</div>
+            <div class="pk-step-info">
+              <h4 class="pk-step-title">Perform a ₹1 Pre-Launch Self-Test</h4>
+              <p class="pk-step-desc">After embedding the widget on your staging domain or personal blog, open it on a mobile device and complete a ₹1 test contribution to verify your bank credits the funds immediately.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pk-code-modal-footer pk-guide-footer">
+        <button type="button" class="pk-btn-primary" id="guideAcknowledgeBtn">Got it, Let's Build! &rarr;</button>
       </div>
     </div>
   </div>
