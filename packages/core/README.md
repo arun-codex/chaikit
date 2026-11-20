@@ -38,4 +38,4 @@ const qrSvg = generateQrSvg(upiUri, { size: 200 });
 
 ## License
 
-[MIT](file:///C:/User/OnlyChai/packages/core/LICENSE) © 2026 ChaiKit Contributors
+[MIT](LICENSE) © 2026 ChaiKit Contributors

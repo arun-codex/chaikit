@@ -110,6 +110,7 @@ npm install @chaikit/react
 ```tsx
 'use client';
 
+import React from 'react';
 import { ChaiSupport } from '@chaikit/react';
 
 export function Header() {
@@ -121,9 +122,61 @@ export function Header() {
       theme="classic"
       position="bottom-right"
       buttonText="Buy Me a Chai ☕"
+      onTierSelected={(tier) => console.log('Selected:', tier.name)}
+      onHandoffAttempt={(uri) => console.log('UPI intent:', uri)}
     />
   );
 }
+```
+
+### 4. Vue 3 Integration
+
+```bash
+npm install @chaikit/widget
+```
+
+In your Single File Component (`.vue`):
+
+```vue
+<template>
+  <chai-support
+    creator-name="Aarav Mehta"
+    upi-id="aarav@okhdfcbank"
+    theme="auto"
+    position="bottom-right"
+    button-text="Buy Me a Chai ☕"
+  />
+</template>
+
+<script setup>
+import { onMounted } from 'vue';
+
+onMounted(async () => {
+  // Dynamically load the custom element in browser context
+  await import('@chaikit/widget');
+});
+</script>
+```
+
+### 5. WordPress / Static CMS Sites
+
+For WordPress, Ghost, Substack, Jekyll, or Hugo sites that permit custom HTML/scripts:
+
+1. In WordPress Admin, navigate to **Appearance → Theme Settings → Custom Scripts** (or insert a **Custom HTML** block into your site footer or template).
+2. Paste the single script tag and element:
+
+```html
+<!-- Load ChaiKit Web Component from CDN -->
+<script defer src="https://cdn.jsdelivr.net/npm/@chaikit/widget@1.0.0/dist/chaikit.iife.js"></script>
+
+<!-- Add the supporter widget -->
+<chai-support
+  creator-name="Rohan Sen"
+  upi-id="rohan@okhdfcbank"
+  theme="classic"
+  position="bottom-right"
+  button-text="Buy Me a Chai ☕">
+</chai-support>
 ```
 
 ---
@@ -195,6 +248,67 @@ ChaiKit maintains strict transparency:
 ### Mobile Hand-off & In-App WebViews
 - On mobile devices, clicking **"Open in UPI App"** triggers the native `upi://pay` intent handler.
 - If deep-links are blocked by in-app browsers (e.g., Instagram, Twitter/X, LinkedIn WebViews), ChaiKit provides immediate fallback: the high-contrast QR code remains scannable and a single tap copies the creator's UPI ID to the clipboard.
+
+---
+
+## 🎨 Customizing Themes, Tiers & 3D
+
+### Custom Themes
+ChaiKit supports five built-in themes plus custom hex accent overrides:
+- `classic` — Earthen terracotta and spiced caramel (default)
+- `dark` — Deep espresso roasted dark palette
+- `cream` — Warm cream and soft biscuit tones
+- `minimal` — High-contrast monochrome layout
+- `auto` — Dynamically adapts to user's system OS light/dark mode
+
+```html
+<chai-support
+  creator-name="Aarav"
+  upi-id="aarav@upi"
+  theme="dark"
+  accent-color="#F59E0B">
+</chai-support>
+```
+
+### Custom Tiers
+Override the default 4 tiers by passing a serialized JSON string in HTML or an array in React:
+
+```html
+<chai-support
+  creator-name="Aarav"
+  upi-id="aarav@upi"
+  tiers='[
+    {"id":"sip","name":"Quick Sip","amountPaise":1500,"description":"A quick tea break"},
+    {"id":"pot","name":"Chai Pot","amountPaise":4000,"description":"Fuel for the evening"},
+    {"id":"box","name":"Masala Box","amountPaise":10000,"description":"Supporter feast"}
+  ]'>
+</chai-support>
+```
+
+### Enabling Optional 3D Viewport
+Add `enable-3d` to load the procedural WebGL clay kulhad viewport. It loads lazily on demand (~4 KB gzipped), with automatic 2D fallback on devices without WebGL:
+
+```html
+<chai-support creator-name="Aarav" upi-id="aarav@upi" enable-3d></chai-support>
+```
+
+---
+
+## 🔒 Safe Pre-Launch Testing & Verification
+
+1. **Staging / Preview Testing (`demo-mode`):**
+   When testing your website on local dev servers, staging URLs, or pull request previews, add the `demo-mode` attribute. This displays a non-payable placeholder QR code and disables live mobile app intents:
+   ```html
+   <chai-support creator-name="Dev" upi-id="dev@upi" demo-mode></chai-support>
+   ```
+
+2. **Pre-Launch ₹1 Self-Test:**
+   Before announcing ChaiKit on your live website:
+   - Remove `demo-mode` in production.
+   - Open your website on a physical mobile phone.
+   - Click your launcher button, select a tier or enter `₹1`, and tap "Open in UPI App".
+   - Complete the ₹1 transfer from your banking app.
+   - Verify that your bank account immediately reflects the ₹1 credit with the correct narration.
 
 ---
 

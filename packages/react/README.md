@@ -71,4 +71,4 @@ export function SupporterWidget() {
 
 ## License
 
-[MIT](file:///C:/User/OnlyChai/packages/react/LICENSE) © 2026 ChaiKit Contributors
+[MIT](LICENSE) © 2026 ChaiKit Contributors

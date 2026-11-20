@@ -45,4 +45,4 @@ import '@chaikit/widget';
 
 ## License
 
-[MIT](file:///C:/User/OnlyChai/packages/widget/LICENSE) © 2026 ChaiKit Contributors
+[MIT](LICENSE) © 2026 ChaiKit Contributors
