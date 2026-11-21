@@ -36,9 +36,9 @@ export function mountChaiKit(
   if (config.defaultTierId) el.setAttribute('default-tier', config.defaultTierId);
   if (config.enable3D) el.setAttribute('enable-3d', '');
 
-  target.appendChild(el);
-  // Apply the entire typed API, including demoMode, limits, custom tiers and 3D.
+  // Configure while detached: demo mode must be active before the element is exposed.
   el.updateConfig(config);
+  target.appendChild(el);
   return el;
 }
 
