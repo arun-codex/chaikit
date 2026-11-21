@@ -37,6 +37,8 @@ export function mountChaiKit(
   if (config.enable3D) el.setAttribute('enable-3d', '');
 
   target.appendChild(el);
+  // Apply the entire typed API, including demoMode, limits, custom tiers and 3D.
+  el.updateConfig(config);
   return el;
 }
 
