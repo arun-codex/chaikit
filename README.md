@@ -68,6 +68,13 @@ Most creator support widgets are built for Western payment gateways or require c
 
 ---
 
+## Install from the correct npm scope
+
+The official packages in this repository are `@chaikit/core`, `@chaikit/widget`, and `@chaikit/react`.
+The unscoped npm package named `chaikit` is **not** one of these packages. Verify
+the exact `@chaikit/` scope and package provenance before installing dependencies.
+A GitHub Actions release **dry run** checks packages but does not publish them to npm.
+
 ## Quick Start
 
 ### 1. Plain HTML / Static Sites / WordPress Embed
