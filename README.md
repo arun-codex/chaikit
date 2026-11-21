@@ -130,7 +130,7 @@ export function Header() {
       position="bottom-right"
       buttonText="Buy Me a Chai ☕"
       onTierSelected={(tier) => console.log('Selected:', tier.name)}
-      onHandoffAttempt={(uri) => console.log('UPI intent:', uri)}
+      onUpiHandoff={(uri) => console.log('UPI intent:', uri)}
     />
   );
 }
