@@ -45,6 +45,7 @@ export class SupportModal {
   private currentAmountPaise: number = 2500; // default Kadak Chai ₹25
   private chai3dView: any = null;
   private chai3dStageEl: HTMLElement | null = null;
+  private isDestroyed = false;
 
   constructor(options: SupportModalOptions) {
     this.options = {
@@ -140,6 +141,8 @@ export class SupportModal {
   }
 
   public destroy(): void {
+    this.isDestroyed = true;
+    this.chai3dStageEl = null;
     if (this.chai3dView) {
       this.chai3dView.destroy();
       this.chai3dView = null;
@@ -246,7 +249,8 @@ export class SupportModal {
       const currentTierId = this.options.defaultTierId || this.options.tiers?.[1]?.id || 'kadak';
       import('../3d/Chai3DView.js')
         .then(({ Chai3DView }) => {
-          if (!this.chai3dStageEl) return;
+          // Dynamic import may resolve after the modal was removed or reconfigured.
+          if (this.isDestroyed || !this.chai3dStageEl) return;
           this.chai3dView = new Chai3DView(this.chai3dStageEl, {
             tierId: currentTierId,
             width: 260,
