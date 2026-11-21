@@ -8,6 +8,7 @@ import {
   DEFAULT_MIN_AMOUNT_PAISE,
   DEFAULT_TIERS,
   formatRupees,
+  validateAmount,
   validateConfig,
   type ChaiEventDetailMap,
   type ChaiEventName,
@@ -133,9 +134,16 @@ export class ChaiSupportElement extends SafeHTMLElement {
    * Programmatically set contribution amount in paise.
    */
   public setAmount(amountPaise: number): void {
-    if (this.modal) {
-      this.modal.setAmount(amountPaise);
+    const validity = validateAmount(
+      amountPaise,
+      this.config.minAmountPaise ?? DEFAULT_MIN_AMOUNT_PAISE,
+      this.config.maxAmountPaise ?? DEFAULT_MAX_AMOUNT_PAISE
+    );
+    if (!validity.valid) {
+      this.dispatchChaiEvent('chai:error', { message: validity.error || 'Invalid contribution amount.', code: 'INVALID_AMOUNT' });
+      return;
     }
+    this.modal?.setAmount(amountPaise);
   }
 
   /**
@@ -173,8 +181,8 @@ export class ChaiSupportElement extends SafeHTMLElement {
       if (suggestedAttr) {
         const amounts = suggestedAttr
           .split(',')
-          .map((s) => parseInt(s.trim(), 10) * 100)
-          .filter((n) => !isNaN(n) && n > 0);
+          .map((s) => Number(s.trim()) * 100)
+          .filter((n) => Number.isSafeInteger(n) && n > 0);
         if (amounts.length > 0) {
           const tierIcons = ['cutting', 'kadak', 'tandoori', 'premium'];
           const tierNames = ['Cutting Chai', 'Kadak Chai', 'Tandoori Chai', 'Premium Chai'];
@@ -191,8 +199,8 @@ export class ChaiSupportElement extends SafeHTMLElement {
 
     const minAttr = this.getAttribute('min-amount');
     const maxAttr = this.getAttribute('max-amount');
-    const minAmountPaise = minAttr ? parseInt(minAttr, 10) * 100 : this.config.minAmountPaise ?? DEFAULT_MIN_AMOUNT_PAISE;
-    const maxAmountPaise = maxAttr ? parseInt(maxAttr, 10) * 100 : this.config.maxAmountPaise ?? DEFAULT_MAX_AMOUNT_PAISE;
+    const minAmountPaise = minAttr !== null ? Number(minAttr) * 100 : this.config.minAmountPaise ?? DEFAULT_MIN_AMOUNT_PAISE;
+    const maxAmountPaise = maxAttr !== null ? Number(maxAttr) * 100 : this.config.maxAmountPaise ?? DEFAULT_MAX_AMOUNT_PAISE;
 
     this.config = {
       ...this.config,
@@ -234,6 +242,13 @@ export class ChaiSupportElement extends SafeHTMLElement {
       const errorMsg = `ChaiKit configuration error: ${validation.errors.join(' ')}`;
       console.error(errorMsg);
       this.dispatchChaiEvent('chai:error', { message: errorMsg, code: 'INVALID_CONFIG' });
+      // Fail closed: never render payment actions or an imaginary fallback recipient.
+      const errorEl = document.createElement('p');
+      errorEl.setAttribute('role', 'alert');
+      errorEl.textContent = 'ChaiKit is unavailable because the creator or payment configuration is invalid.';
+      this.shadow.appendChild(errorEl);
+      this.isRendered = true;
+      return;
     }
 
     // Inject encapsulated styles
@@ -324,7 +339,10 @@ export class ChaiSupportElement extends SafeHTMLElement {
   private cleanup(): void {
     if (this.modal) {
       this.modal.destroy();
+      this.modal = null;
     }
+    this.launcher = null;
+    this.announcer = null;
     if (this.escapeListener) {
       window.removeEventListener('keydown', this.escapeListener);
       this.escapeListener = null;
