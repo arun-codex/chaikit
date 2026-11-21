@@ -21,25 +21,24 @@ export function paiseToRupees(paise: number): number {
  */
 export function rupeesToPaise(rupees: number | string): number {
   if (typeof rupees === 'string') {
-    rupees = rupees.trim();
-    if (rupees === '' || isNaN(Number(rupees))) {
+    const normalized = rupees.trim();
+    // Reject scientific notation, multiple decimal separators, and silent paise truncation.
+    if (!/^[+-]?\d+(?:\.\d{1,2})?$/.test(normalized)) {
       return 0;
     }
-    const parts = rupees.split('.');
-    const whole = parseInt(parts[0] || '0', 10);
-    let fraction = 0;
-    if (parts.length > 1) {
-      const fracStr = (parts[1] + '00').slice(0, 2);
-      fraction = parseInt(fracStr, 10);
-    }
-    return whole * 100 + fraction;
+    const sign = normalized.startsWith('-') ? -1 : 1;
+    const unsigned = normalized.replace(/^[+-]/, '');
+    const [whole, fraction = ''] = unsigned.split('.');
+    const paise = Number(whole) * 100 + Number(fraction.padEnd(2, '0'));
+    return Number.isSafeInteger(paise) ? sign * paise : 0;
   }
 
   if (typeof rupees === 'number') {
     if (isNaN(rupees) || !isFinite(rupees)) {
       return 0;
     }
-    return Math.round(rupees * 100);
+    const paise = Math.round(rupees * 100);
+    return Number.isSafeInteger(paise) ? paise : 0;
   }
 
   return 0;

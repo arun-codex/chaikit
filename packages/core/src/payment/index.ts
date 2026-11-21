@@ -43,7 +43,7 @@ export function buildUpiUri(params: {
     throw new Error(`Cannot build UPI URI: ${upiCheck.error}`);
   }
 
-  if (typeof params.amountPaise !== 'number' || isNaN(params.amountPaise) || !isFinite(params.amountPaise) || params.amountPaise <= 0) {
+  if (!Number.isSafeInteger(params.amountPaise) || params.amountPaise <= 0) {
     throw new Error('Cannot build UPI URI: Amount must be a positive number of paise (greater than 0).');
   }
 
@@ -92,7 +92,7 @@ export function parseUpiUri(uri: string): UpiParams | null {
     }
 
     const numAm = Number(am);
-    if (isNaN(numAm) || numAm <= 0) {
+    if (!validateUpiId(pa).valid || !/^(?:0|[1-9]\d*)(?:\.\d{1,2})?$/.test(am) || !Number.isFinite(numAm) || numAm <= 0) {
       return null;
     }
 
@@ -141,6 +141,16 @@ export function attemptUpiHandoff(upiUri: string): UpiHandoffResult {
       success: false,
       error: 'Window environment not available.',
       note: 'UPI handoff can only be executed in a browser environment.',
+    };
+  }
+
+  // Never navigate to an arbitrary URL or javascript: scheme through this public API.
+  if (!parseUpiUri(upiUri)) {
+    return {
+      dispatched: false,
+      success: false,
+      error: 'Invalid UPI payment URI.',
+      note: 'Only valid upi://pay links may be dispatched.',
     };
   }
 

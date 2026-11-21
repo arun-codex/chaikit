@@ -610,9 +610,9 @@ export default function SupporterWidget() {
       theme="${theme}"
       position="${pos}"
       buttonText="${btnText}"
-      accentColor="${accent}"${state.enable3D ? '\n      enable3D={true}' : ''}${state.position === 'headless' ? '\n      headless={true}' : ''}
+      accentColor="${accent}"${state.enable3D ? '\n      enable3D={true}' : ''}${state.position === 'headless' ? '\n      headless={true}' : ''}${isTiersCustomized ? `\n      tiers={${JSON.stringify(state.tiers)}}` : ''}
       onTierSelected={(tier) => console.log('Chai tier selected:', tier.name)}
-      onHandoffAttempt={(uri) => console.log('UPI payment initiated:', uri)}
+      onUpiHandoff={(uri) => console.log('UPI payment initiated:', uri)}
     />
   );
 }`;

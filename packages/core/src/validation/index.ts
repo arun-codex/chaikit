@@ -145,11 +145,11 @@ export function validateConfig(config: ChaiKitConfig): ValidationResult {
   const minPaise = config.minAmountPaise ?? DEFAULT_MIN_AMOUNT_PAISE;
   const maxPaise = config.maxAmountPaise ?? DEFAULT_MAX_AMOUNT_PAISE;
 
-  if (minPaise <= 0) {
-    errors.push('minAmountPaise must be greater than 0.');
+  if (!Number.isSafeInteger(minPaise) || minPaise <= 0) {
+    errors.push('minAmountPaise must be a positive integer number of paise.');
   }
-  if (maxPaise < minPaise) {
-    errors.push('maxAmountPaise cannot be less than minAmountPaise.');
+  if (!Number.isSafeInteger(maxPaise) || maxPaise <= 0 || maxPaise < minPaise) {
+    errors.push('maxAmountPaise must be a positive integer and not less than minAmountPaise.');
   }
 
   // Validate tiers if provided
@@ -157,17 +157,24 @@ export function validateConfig(config: ChaiKitConfig): ValidationResult {
     if (!Array.isArray(config.tiers) || config.tiers.length === 0) {
       errors.push('tiers must be a non-empty array of contribution tiers.');
     } else {
+      const ids = new Set<string>();
       config.tiers.forEach((tier, index) => {
-        if (!tier.id || typeof tier.id !== 'string') {
-          errors.push(`Tier at index ${index} must have a valid string id.`);
+        if (!tier || typeof tier !== 'object') {
+          errors.push(`Tier at index ${index} must be an object.`);
+          return;
         }
-        if (!tier.name || typeof tier.name !== 'string') {
+        if (!tier.id || typeof tier.id !== 'string' || !tier.id.trim()) {
+          errors.push(`Tier at index ${index} must have a valid string id.`);
+        } else if (ids.has(tier.id)) {
+          errors.push(`Duplicate tier id '${tier.id}'.`);
+        } else {
+          ids.add(tier.id);
+        }
+        if (!tier.name || typeof tier.name !== 'string' || !tier.name.trim()) {
           errors.push(`Tier at index ${index} must have a valid string name.`);
         }
-        if (typeof tier.amountPaise !== 'number' || tier.amountPaise < minPaise || tier.amountPaise > maxPaise) {
-          errors.push(
-            `Tier '${tier.name || index}' amount (₹${tier.amountPaise / 100}) is outside permitted bounds (₹${minPaise / 100} - ₹${maxPaise / 100}).`
-          );
+        if (!validateAmount(tier.amountPaise, minPaise, maxPaise).valid) {
+          errors.push(`Tier at index ${index} must have an integer paise amount within the configured limits.`);
         }
       });
     }

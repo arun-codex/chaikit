@@ -29,6 +29,8 @@ export interface ChaiSupportProps {
   position?: ChaiKitPosition;
   accentColor?: string;
   animation?: ChaiKitAnimation;
+  enable3D?: boolean;
+  demoMode?: boolean;
   headless?: boolean;
   defaultTierId?: string;
   tiers?: ChaiTier[];
@@ -138,6 +140,8 @@ export const ChaiSupport = forwardRef<ChaiSupportRef, ChaiSupportProps>(
         position: props.position,
         accentColor: props.accentColor,
         animation: props.animation,
+        enable3D: props.enable3D,
+        demoMode: props.demoMode,
         headless: props.headless,
         defaultTierId: props.defaultTierId,
         tiers: props.tiers,
@@ -156,6 +160,8 @@ export const ChaiSupport = forwardRef<ChaiSupportRef, ChaiSupportProps>(
       props.position,
       props.accentColor,
       props.animation,
+      props.enable3D,
+      props.demoMode,
       props.headless,
       props.defaultTierId,
       props.tiers,
@@ -182,6 +188,8 @@ export const ChaiSupport = forwardRef<ChaiSupportRef, ChaiSupportProps>(
         button-text={props.buttonText}
         accent-color={props.accentColor}
         headless={props.headless ? '' : undefined}
+        enable-3d={props.enable3D ? '' : undefined}
+        demo-mode={props.demoMode ? '' : undefined}
         note={props.note}
         default-tier={props.defaultTierId}
         min-amount={

@@ -13,7 +13,7 @@ export class FocusTrap {
   }
 
   public activate(triggerElement?: HTMLElement | null): void {
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined' || this.keydownListener) return;
 
     // Remember the trigger element, fallback to activeElement
     const rootNode = this.container.getRootNode() as Document | ShadowRoot;
