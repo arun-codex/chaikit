@@ -77,14 +77,24 @@ export class TierSelector {
         `${tier.name}: ${formatRupees(tier.amountPaise)}. ${tier.description || ''}`
       );
 
+      // Only the built-in SVG icon is HTML. Tier metadata is assigned as text.
       card.innerHTML = /* html */ `
         <div class="chai-tier-icon" aria-hidden="true">
           ${getTierIconSvg(tier.icon || tier.id)}
         </div>
-        <div class="chai-tier-name">${tier.name}</div>
-        <div class="chai-tier-amount">${formatRupees(tier.amountPaise)}</div>
-        ${tier.description ? `<div class="chai-tier-desc">${tier.description}</div>` : ''}
+        <div class="chai-tier-name"></div>
+        <div class="chai-tier-amount"></div>
       `;
+      const nameEl = card.querySelector('.chai-tier-name');
+      const amountEl = card.querySelector('.chai-tier-amount');
+      if (nameEl) nameEl.textContent = tier.name;
+      if (amountEl) amountEl.textContent = formatRupees(tier.amountPaise);
+      if (tier.description) {
+        const descriptionEl = document.createElement('div');
+        descriptionEl.className = 'chai-tier-desc';
+        descriptionEl.textContent = tier.description;
+        card.appendChild(descriptionEl);
+      }
 
       card.addEventListener('click', () => {
         this.selectTier(tier.id);
