@@ -82,8 +82,8 @@ export class CustomAmountInput {
     input.id = 'chai-custom-input';
     input.type = 'text';
     input.className = 'chai-amount-input';
-    input.inputMode = 'numeric';
-    input.pattern = '[0-9]*';
+    input.inputMode = 'decimal';
+    input.pattern = '[0-9]+(\\.[0-9]{1,2})?';
     input.placeholder = 'Enter amount in ₹';
     input.setAttribute('aria-label', 'Custom contribution amount in rupees');
 
@@ -104,6 +104,12 @@ export class CustomAmountInput {
       const val = input.value.trim();
       if (!val) {
         this.clearError();
+        this.options.onAmountChange(0, false);
+        return;
+      }
+
+      if (!/^\d+(?:\.\d{1,2})?$/.test(val)) {
+        this.setError('Enter a valid rupee amount with at most two decimal places.');
         this.options.onAmountChange(0, false);
         return;
       }
