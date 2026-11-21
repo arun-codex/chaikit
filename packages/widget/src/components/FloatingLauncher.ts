@@ -56,8 +56,10 @@ export class FloatingLauncher {
       <span class="chai-launcher-icon" aria-hidden="true">
         ${getMiniCupSvg()}
       </span>
-      <span class="chai-launcher-text">${this.options.buttonText}</span>
+      <span class="chai-launcher-text"></span>
     `;
+    const launcherText = btn.querySelector('.chai-launcher-text');
+    if (launcherText) launcherText.textContent = this.options.buttonText;
 
     btn.addEventListener('click', (e) => {
       e.preventDefault();
