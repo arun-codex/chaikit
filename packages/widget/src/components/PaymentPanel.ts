@@ -165,8 +165,10 @@ export class PaymentPanel {
     } else {
       upiWrapper.innerHTML = /* html */ `
         <span class="chai-upi-label">UPI ID: </span>
-        <span class="chai-upi-value">${this.options.upiId}</span>
+        <span class="chai-upi-value"></span>
       `;
+      const upiIdEl = upiWrapper.querySelector('.chai-upi-value');
+      if (upiIdEl) upiIdEl.textContent = this.options.upiId;
     }
 
     details.appendChild(amountWrapper);
